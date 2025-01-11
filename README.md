@@ -1,3 +1,3 @@
 # rahmatez - Personal portfolio
 
-terimakasih untuk : codewithsadee 
+Thanks For : codewithsadee 
