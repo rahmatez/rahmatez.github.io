@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authentication Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .buttons {
+        margin: 10px 0;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: #007bff;
+        color: white;
+      }
+      .btn-success {
+        background: #28a745;
+        color: white;
+      }
+      .btn-danger {
+        background: #dc3545;
+        color: white;
+      }
+      .btn-warning {
+        background: #ffc107;
+        color: black;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+      .status.logged-in {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.logged-out {
+        background: #f8d7da;
+        color: #721c24;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Authentication System Test</h1>
+
+    <div class="test-section">
+      <h2>Authentication Status</h2>
+      <div id="authStatus" class="status logged-out">Not authenticated</div>
+      <div id="userInfo"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Authentication Actions</h2>
+      <div class="buttons">
+        <button
+          id="loginBtn"
+          class="btn-primary"
+          onclick="authManager.showLogin()">
+          Show Login Modal
+        </button>
+        <button
+          id="logoutBtn"
+          class="btn-danger"
+          onclick="authManager.logout()">
+          Logout
+        </button>
+        <button
+          id="checkStatusBtn"
+          class="btn-warning"
+          onclick="updateAuthStatus()">
+          Check Status
+        </button>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>Protected Actions</h2>
+      <div class="buttons">
+        <button class="btn-success" onclick="testProtectedAction('projects')">
+          Test Project Management
+        </button>
+        <button class="btn-success" onclick="testProtectedAction('contacts')">
+          Test Contact Management
+        </button>
+      </div>
+      <div id="protectedResult"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Demo Credentials</h2>
+      <p>
+        <strong>Username:</strong>
+        admin
+      </p>
+      <p>
+        <strong>Password:</strong>
+        rahmatez2024
+      </p>
+    </div>
+
+    <div class="test-section">
+      <h2>Test Instructions</h2>
+      <ol>
+        <li>Click "Show Login Modal" to test the login interface</li>
+        <li>Use the demo credentials to login</li>
+        <li>Check that the authentication status updates</li>
+        <li>Test protected actions (should work when logged in)</li>
+        <li>Test logout functionality</li>
+      </ol>
+    </div>
+
+    <!-- Load authentication system -->
+    <script src="assets/js/auth-manager.js"></script>
+
+    <script>
+      // Test functions
+      function updateAuthStatus() {
+        const statusDiv = document.getElementById("authStatus");
+        const userInfoDiv = document.getElementById("userInfo");
+
+        if (authManager.isLoggedIn()) {
+          const session = authManager.getSession();
+          statusDiv.textContent = "Authenticated";
+          statusDiv.className = "status logged-in";
+          userInfoDiv.innerHTML = `
+                    <p><strong>User:</strong> ${session.username}</p>
+                    <p><strong>Role:</strong> ${session.role}</p>
+                    <p><strong>Login Time:</strong> ${new Date(
+                      session.loginTime
+                    ).toLocaleString()}</p>
+                `;
+        } else {
+          statusDiv.textContent = "Not authenticated";
+          statusDiv.className = "status logged-out";
+          userInfoDiv.innerHTML = "";
+        }
+      }
+
+      function testProtectedAction(type) {
+        const resultDiv = document.getElementById("protectedResult");
+
+        if (!authManager.isLoggedIn()) {
+          resultDiv.innerHTML = `<p style="color: red;">❌ Access denied to ${type} management. Please login first.</p>`;
+          authManager.showLogin();
+          return;
+        }
+
+        resultDiv.innerHTML = `<p style="color: green;">✅ Access granted to ${type} management!</p>`;
+
+        // Simulate protected action
+        setTimeout(() => {
+          resultDiv.innerHTML += `<p style="color: blue;">📝 Simulating ${type} CRUD operations...</p>`;
+        }, 1000);
+      }
+
+      // Listen for authentication state changes
+      window.addEventListener("authStateChanged", function (event) {
+        console.log("Auth state changed:", event.detail);
+        updateAuthStatus();
+      });
+
+      // Initialize status on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        updateAuthStatus();
+      });
+    </script>
+  </body>
+</html>

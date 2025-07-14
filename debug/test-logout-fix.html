@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logout Fix Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-weight: bold;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn-primary {
+        background: #007bff;
+        color: white;
+      }
+      .btn-success {
+        background: #28a745;
+        color: white;
+      }
+      .btn-danger {
+        background: #dc3545;
+        color: white;
+      }
+      .btn-warning {
+        background: #ffc107;
+        color: black;
+      }
+      .demo-credentials {
+        background: #fff3cd;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 15px 0;
+      }
+      .test-instructions {
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 15px 0;
+      }
+      .panel-status {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Logout Fix Test</h1>
+
+    <div class="test-container">
+      <h2>🔐 Authentication Flow Test</h2>
+      <div class="demo-credentials">
+        <h4>Demo Credentials:</h4>
+        <p>
+          <strong>Username:</strong>
+          admin
+        </p>
+        <p>
+          <strong>Password:</strong>
+          rahmatez2024
+        </p>
+      </div>
+
+      <div class="test-instructions">
+        <h4>Test Instructions:</h4>
+        <ol>
+          <li>Click "Login" to authenticate</li>
+          <li>Open admin panels (Project, Contact, Password Change)</li>
+          <li>Click "Logout" and verify all panels are closed</li>
+          <li>Verify no login modal appears automatically after logout</li>
+        </ol>
+      </div>
+
+      <div>
+        <button class="btn-primary" onclick="testLogin()">Login</button>
+        <button class="btn-success" onclick="openProjectAdmin()">
+          Open Project Admin
+        </button>
+        <button class="btn-success" onclick="openContactAdmin()">
+          Open Contact Admin
+        </button>
+        <button class="btn-warning" onclick="openPasswordChange()">
+          Open Password Change
+        </button>
+        <button class="btn-danger" onclick="testLogout()">Logout</button>
+      </div>
+
+      <div id="authStatus" class="status info">Ready for testing</div>
+    </div>
+
+    <div class="test-container">
+      <h2>📋 Panel Status Monitor</h2>
+      <div id="panelStatus" class="panel-status">Checking panel status...</div>
+      <button class="btn-warning" onclick="checkPanelStatus()">
+        Refresh Panel Status
+      </button>
+    </div>
+
+    <div class="test-container">
+      <h2>🧪 Automated Logout Test</h2>
+      <div class="test-instructions">
+        <p>This test will automatically:</p>
+        <ul>
+          <li>Login with demo credentials</li>
+          <li>Open all admin panels</li>
+          <li>Perform logout</li>
+          <li>Verify all panels are closed</li>
+        </ul>
+      </div>
+      <button class="btn-success" onclick="runAutomatedTest()">
+        Run Automated Test
+      </button>
+      <div id="automatedTestResult" class="status info">
+        Click "Run Automated Test" to start
+      </div>
+    </div>
+
+    <!-- Load required scripts -->
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/crud-projects.js"></script>
+    <script src="assets/js/crud-contact.js"></script>
+
+    <script>
+      function updateAuthStatus() {
+        const statusDiv = document.getElementById("authStatus");
+        if (authManager.isLoggedIn()) {
+          statusDiv.className = "status success";
+          statusDiv.textContent =
+            "✅ Authenticated - Admin panels are available";
+        } else {
+          statusDiv.className = "status info";
+          statusDiv.textContent = "ℹ️ Not authenticated - Please login to test";
+        }
+      }
+
+      function checkPanelStatus() {
+        const statusDiv = document.getElementById("panelStatus");
+
+        const panels = [
+          { id: "auth-modal", name: "Login Modal" },
+          { id: "admin-panel", name: "Auth Admin Panel" },
+          { id: "project-admin-panel", name: "Project Admin Panel" },
+          { id: "contact-admin-panel", name: "Contact Admin Panel" },
+          { id: "password-modal", name: "Password Change Modal" },
+        ];
+
+        let status = "Panel Status:\n";
+        panels.forEach((panel) => {
+          const element = document.getElementById(panel.id);
+          const exists = element !== null;
+          const visible = exists && element.style.display !== "none";
+          status += `${panel.name}: ${
+            exists ? (visible ? "🟢 OPEN" : "🟡 HIDDEN") : "🔴 CLOSED"
+          }\n`;
+        });
+
+        statusDiv.textContent = status;
+      }
+
+      async function testLogin() {
+        try {
+          await authManager.login("admin", "rahmatez2024");
+          updateAuthStatus();
+          checkPanelStatus();
+        } catch (error) {
+          document.getElementById("authStatus").className = "status error";
+          document.getElementById("authStatus").textContent =
+            "❌ Login failed: " + error.message;
+        }
+      }
+
+      function openProjectAdmin() {
+        if (!authManager.isLoggedIn()) {
+          alert("Please login first");
+          return;
+        }
+
+        if (typeof showProjectAdmin === "function") {
+          showProjectAdmin();
+        } else {
+          // Simulate project admin panel
+          const panel = document.createElement("div");
+          panel.id = "project-admin-panel";
+          panel.innerHTML = `
+                    <div style="position: fixed; top: 10px; right: 10px; background: white; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;">
+                        <h3>Project Admin Panel (Simulated)</h3>
+                        <button onclick="this.parentElement.parentElement.remove()">Close</button>
+                    </div>
+                `;
+          document.body.appendChild(panel);
+        }
+        setTimeout(checkPanelStatus, 100);
+      }
+
+      function openContactAdmin() {
+        if (!authManager.isLoggedIn()) {
+          alert("Please login first");
+          return;
+        }
+
+        if (typeof displayMessages === "function") {
+          displayMessages();
+        } else {
+          // Simulate contact admin panel
+          const panel = document.createElement("div");
+          panel.id = "contact-admin-panel";
+          panel.innerHTML = `
+                    <div style="position: fixed; top: 60px; right: 10px; background: white; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;">
+                        <h3>Contact Admin Panel (Simulated)</h3>
+                        <button onclick="this.parentElement.parentElement.remove()">Close</button>
+                    </div>
+                `;
+          document.body.appendChild(panel);
+        }
+        setTimeout(checkPanelStatus, 100);
+      }
+
+      function openPasswordChange() {
+        if (!authManager.isLoggedIn()) {
+          alert("Please login first");
+          return;
+        }
+
+        authManager.showPasswordChange();
+        setTimeout(checkPanelStatus, 100);
+      }
+
+      function testLogout() {
+        const beforePanelCount = document.querySelectorAll(
+          '[id$="-panel"], [id$="-modal"]'
+        ).length;
+
+        authManager.logout();
+
+        setTimeout(() => {
+          const afterPanelCount = document.querySelectorAll(
+            '[id$="-panel"], [id$="-modal"]'
+          ).length;
+
+          updateAuthStatus();
+          checkPanelStatus();
+
+          const statusDiv = document.getElementById("authStatus");
+          if (afterPanelCount === 0) {
+            statusDiv.className = "status success";
+            statusDiv.textContent = `✅ Logout successful! All panels closed (${beforePanelCount} → ${afterPanelCount})`;
+          } else {
+            statusDiv.className = "status error";
+            statusDiv.textContent = `❌ Logout issue! ${afterPanelCount} panels still open`;
+          }
+        }, 500);
+      }
+
+      async function runAutomatedTest() {
+        const resultDiv = document.getElementById("automatedTestResult");
+
+        try {
+          resultDiv.className = "status info";
+          resultDiv.textContent = "🔄 Running automated test...";
+
+          // Step 1: Login
+          await authManager.login("admin", "rahmatez2024");
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          // Step 2: Open all panels
+          openProjectAdmin();
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          openContactAdmin();
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          openPasswordChange();
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          // Check panels before logout
+          const beforePanelCount = document.querySelectorAll(
+            '[id$="-panel"], [id$="-modal"]'
+          ).length;
+
+          // Step 3: Logout
+          authManager.logout();
+
+          // Step 4: Check results
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          const afterPanelCount = document.querySelectorAll(
+            '[id$="-panel"], [id$="-modal"]'
+          ).length;
+          const isLoggedOut = !authManager.isLoggedIn();
+
+          if (isLoggedOut && afterPanelCount === 0) {
+            resultDiv.className = "status success";
+            resultDiv.textContent = `✅ Automated test PASSED! User logged out and all ${beforePanelCount} panels closed.`;
+          } else {
+            resultDiv.className = "status error";
+            resultDiv.textContent = `❌ Automated test FAILED! Logged out: ${isLoggedOut}, Panels closed: ${
+              afterPanelCount === 0
+            }`;
+          }
+
+          updateAuthStatus();
+          checkPanelStatus();
+        } catch (error) {
+          resultDiv.className = "status error";
+          resultDiv.textContent = "❌ Automated test ERROR: " + error.message;
+        }
+      }
+
+      // Listen for auth state changes
+      window.addEventListener("authStateChanged", function (event) {
+        updateAuthStatus();
+        checkPanelStatus();
+      });
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        updateAuthStatus();
+        checkPanelStatus();
+
+        // Auto-refresh panel status every 2 seconds
+        setInterval(checkPanelStatus, 2000);
+      });
+    </script>
+  </body>
+</html>

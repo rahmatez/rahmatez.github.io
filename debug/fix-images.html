@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fix Images - Portfolio Debug</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .debug-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .step {
+        background: #2a2a2a;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+      }
+      .code {
+        background: #1a1a1a;
+        padding: 10px;
+        border-radius: 4px;
+        font-family: monospace;
+        margin: 10px 0;
+        overflow-x: auto;
+      }
+      .button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .button:hover {
+        background: #45a049;
+      }
+      .button.orange {
+        background: #ff9800;
+      }
+      .button.red {
+        background: #f44336;
+      }
+      .image-test {
+        border: 1px solid #444;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .image-test img {
+        max-width: 200px;
+        height: auto;
+        border: 2px solid #666;
+      }
+      .status {
+        padding: 5px 10px;
+        border-radius: 4px;
+        margin: 5px 0;
+        display: inline-block;
+      }
+      .status.success {
+        background: #4caf50;
+      }
+      .status.error {
+        background: #f44336;
+      }
+      .status.warning {
+        background: #ff9800;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>🖼️ Portfolio Images Debug & Fix</h1>
+
+      <div class="step">
+        <h3>📊 Current Storage Status</h3>
+        <div id="storageStatus"></div>
+        <button class="button" onclick="checkStorage()">
+          Check localStorage
+        </button>
+        <button class="button orange" onclick="initializeDefaultProjects()">
+          Initialize Default Projects
+        </button>
+        <button class="button red" onclick="clearStorage()">
+          Clear Storage
+        </button>
+      </div>
+
+      <div class="step">
+        <h3>🔍 Image Path Testing</h3>
+        <div id="imageTests"></div>
+        <button class="button" onclick="testImagePaths()">
+          Test All Image Paths
+        </button>
+      </div>
+
+      <div class="step">
+        <h3>🛠️ Fix Solutions</h3>
+        <div id="fixSolutions"></div>
+        <button class="button" onclick="fixImagePaths()">
+          Auto-Fix Image Paths
+        </button>
+      </div>
+
+      <div class="step">
+        <h3>📋 Current Projects Display</h3>
+        <div id="currentProjects"></div>
+        <button class="button" onclick="displayCurrentProjects()">
+          Show Current Projects
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Check current localStorage status
+      function checkStorage() {
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+        const statusDiv = document.getElementById("storageStatus");
+
+        let html = `<div class="code">`;
+        html += `Total Projects: ${projects.length}<br>`;
+        html += `Storage Key: portfolio_projects<br><br>`;
+
+        if (projects.length > 0) {
+          html += `Projects Data:<br>`;
+          projects.forEach((project, index) => {
+            html += `${index + 1}. ${project.title}<br>`;
+            html += `   Category: ${project.category}<br>`;
+            html += `   Image: ${project.image}<br>`;
+            html += `   Created: ${project.createdAt}<br><br>`;
+          });
+        } else {
+          html += `<span class="status error">No projects found in storage</span><br>`;
+        }
+        html += `</div>`;
+
+        statusDiv.innerHTML = html;
+      }
+
+      // Test image paths
+      function testImagePaths() {
+        const testImages = [
+          "../assets/images/project-1.jpg",
+          "../assets/images/project-2.png",
+          "../assets/images/project-3.jpg",
+          "../assets/images/project-4.png",
+          "../assets/images/project-5.png",
+          "../assets/images/project-6.png",
+          "../assets/images/project-7.png",
+          "../assets/images/project-8.jpg",
+          "../assets/images/project-9.png",
+        ];
+
+        const testsDiv = document.getElementById("imageTests");
+        let html = "";
+
+        testImages.forEach((imagePath, index) => {
+          html += `<div class="image-test">`;
+          html += `<strong>Test ${index + 1}:</strong> ${imagePath}<br>`;
+          html += `<img src="${imagePath}" alt="Test ${index + 1}" 
+                         onload="markImageStatus(${index}, 'success')" 
+                         onerror="markImageStatus(${index}, 'error')" 
+                         id="testImg${index}">`;
+          html += `<div id="status${index}" class="status warning">Loading...</div>`;
+          html += `</div>`;
+        });
+
+        testsDiv.innerHTML = html;
+      }
+
+      function markImageStatus(index, status) {
+        const statusDiv = document.getElementById(`status${index}`);
+        if (status === "success") {
+          statusDiv.className = "status success";
+          statusDiv.textContent = "✅ Image loaded successfully";
+        } else {
+          statusDiv.className = "status error";
+          statusDiv.textContent = "❌ Image failed to load";
+        }
+      }
+
+      // Initialize default projects with correct paths
+      function initializeDefaultProjects() {
+        const defaultProjects = [
+          {
+            id: "finance-" + Date.now(),
+            title: "Finance",
+            category: "web development",
+            image: "../assets/images/project-1.jpg",
+            description:
+              "A comprehensive finance management application built with modern web technologies.",
+            technologies: ["HTML", "CSS", "JavaScript", "PHP"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "orizon-" + Date.now(),
+            title: "Orizon",
+            category: "web development",
+            image: "../assets/images/project-2.png",
+            description:
+              "Modern web application with clean design and smooth user experience.",
+            technologies: ["React", "Node.js", "MongoDB"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "fundo-" + Date.now(),
+            title: "Fundo",
+            category: "web design",
+            image: "../assets/images/project-3.jpg",
+            description:
+              "Creative web design project focusing on user interface and experience.",
+            technologies: ["Figma", "Adobe XD", "CSS3"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "brawlhalla-" + Date.now(),
+            title: "Brawlhalla",
+            category: "ui/ux design",
+            image: "../assets/images/project-4.png",
+            description:
+              "Game interface design with focus on user experience and visual appeal.",
+            technologies: ["Sketch", "Photoshop", "Illustrator"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "dsm-" + Date.now(),
+            title: "DSM",
+            category: "ui/ux design",
+            image: "../assets/images/project-5.png",
+            description:
+              "Design system management tool for consistent brand experience.",
+            technologies: ["Figma", "Design Tokens", "Documentation"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "metaspark-" + Date.now(),
+            title: "MetaSpark",
+            category: "web development",
+            image: "../assets/images/project-6.png",
+            description:
+              "Innovative web platform for digital transformation and automation.",
+            technologies: ["Vue.js", "Express.js", "PostgreSQL"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "summary-" + Date.now(),
+            title: "Summary",
+            category: "web development",
+            image: "../assets/images/project-7.png",
+            description:
+              "Content summarization tool with AI-powered text processing.",
+            technologies: ["Python", "Machine Learning", "API"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "task-manager-" + Date.now(),
+            title: "Task Manager",
+            category: "web development",
+            image: "../assets/images/project-8.jpg",
+            description:
+              "Professional task management system with team collaboration features.",
+            technologies: ["Angular", "Firebase", "TypeScript"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "arrival-" + Date.now(),
+            title: "Arrival",
+            category: "web design",
+            image: "../assets/images/project-9.png",
+            description:
+              "Landing page design for transportation and logistics company.",
+            technologies: ["HTML5", "CSS3", "JavaScript", "GSAP"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+        ];
+
+        localStorage.setItem(
+          "portfolio_projects",
+          JSON.stringify(defaultProjects)
+        );
+
+        document.getElementById("fixSolutions").innerHTML = `
+                <div class="status success">✅ Default projects initialized successfully!</div>
+                <div class="code">Total projects created: ${defaultProjects.length}</div>
+                <button class="button" onclick="window.open('../pages/project.html', '_blank')">View Projects Page</button>
+            `;
+      }
+
+      // Auto-fix image paths for existing projects
+      function fixImagePaths() {
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+
+        if (projects.length === 0) {
+          document.getElementById("fixSolutions").innerHTML = `
+                    <div class="status warning">⚠️ No projects found to fix</div>
+                    <p>Initialize default projects first.</p>
+                `;
+          return;
+        }
+
+        // Fix image paths
+        const fixedProjects = projects.map((project) => {
+          let fixedImage = project.image;
+
+          // Fix common path issues
+          if (
+            fixedImage &&
+            !fixedImage.startsWith("http") &&
+            !fixedImage.startsWith("../assets/")
+          ) {
+            if (fixedImage.startsWith("assets/")) {
+              fixedImage = "../" + fixedImage;
+            } else if (fixedImage.startsWith("/assets/")) {
+              fixedImage = ".." + fixedImage;
+            } else if (!fixedImage.includes("/")) {
+              // If just filename, assume it's in images folder
+              fixedImage = "../assets/images/" + fixedImage;
+            }
+          }
+
+          return {
+            ...project,
+            image: fixedImage,
+          };
+        });
+
+        localStorage.setItem(
+          "portfolio_projects",
+          JSON.stringify(fixedProjects)
+        );
+
+        document.getElementById("fixSolutions").innerHTML = `
+                <div class="status success">✅ Image paths fixed successfully!</div>
+                <div class="code">Fixed ${fixedProjects.length} projects</div>
+                <button class="button" onclick="displayCurrentProjects()">Show Updated Projects</button>
+                <button class="button orange" onclick="window.open('../pages/project.html', '_blank')">View Projects Page</button>
+            `;
+      }
+
+      // Display current projects
+      function displayCurrentProjects() {
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+        const projectsDiv = document.getElementById("currentProjects");
+
+        if (projects.length === 0) {
+          projectsDiv.innerHTML = `<div class="status warning">No projects found</div>`;
+          return;
+        }
+
+        let html = '<div class="code">';
+        projects.forEach((project, index) => {
+          html += `<strong>${index + 1}. ${project.title}</strong><br>`;
+          html += `Category: ${project.category}<br>`;
+          html += `Image: ${project.image}<br>`;
+          html += `Description: ${project.description?.substring(
+            0,
+            100
+          )}...<br>`;
+          html += `Technologies: ${
+            project.technologies?.join(", ") || "N/A"
+          }<br><br>`;
+        });
+        html += "</div>";
+
+        projectsDiv.innerHTML = html;
+      }
+
+      // Clear storage
+      function clearStorage() {
+        if (confirm("Are you sure you want to clear all project data?")) {
+          localStorage.removeItem("portfolio_projects");
+          document.getElementById("storageStatus").innerHTML = `
+                    <div class="status success">✅ Storage cleared successfully!</div>
+                `;
+        }
+      }
+
+      // Auto-run on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        checkStorage();
+
+        // Auto-initialize if no projects exist
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+        if (projects.length === 0) {
+          document.getElementById("fixSolutions").innerHTML = `
+                    <div class="status warning">⚠️ No projects found in storage</div>
+                    <p>Click "Initialize Default Projects" to add sample projects with correct image paths.</p>
+                `;
+        }
+      });
+    </script>
+  </body>
+</html>

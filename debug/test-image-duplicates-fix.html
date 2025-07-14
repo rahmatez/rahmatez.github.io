@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔧 Test Image Duplicates Fix</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #1a1a1a;
+        color: #fff;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .test-section {
+        background: #2a2a2a;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+        border-left: 4px solid #ff7b00;
+      }
+      .project-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+      .project-card {
+        background: #333;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .project-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+      .status {
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8em;
+        font-weight: bold;
+      }
+      .status.unique {
+        background: #4caf50;
+        color: white;
+      }
+      .status.duplicate {
+        background: #f44336;
+        color: white;
+      }
+      .status.error {
+        background: #ff9800;
+        color: white;
+      }
+      .btn {
+        background: #ff7b00;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 16px;
+      }
+      .btn:hover {
+        background: #e56a00;
+      }
+      .btn.success {
+        background: #4caf50;
+      }
+      .btn.success:hover {
+        background: #45a049;
+      }
+      .summary {
+        background: #333;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🔧 Test Image Duplicates Fix</h1>
+        <p>
+          This tool tests and demonstrates the fix for duplicate project images
+        </p>
+      </div>
+
+      <div class="test-section">
+        <h2>🎯 Test Actions</h2>
+        <button class="btn" onclick="loadCurrentProjects()">
+          📋 Load Current Projects
+        </button>
+        <button class="btn" onclick="createTestDuplicates()">
+          🔄 Create Test Duplicates
+        </button>
+        <button class="btn success" onclick="runImageFix()">
+          🔧 Run Image Fix
+        </button>
+        <button class="btn" onclick="clearAllProjects()">
+          🗑️ Clear All Projects
+        </button>
+        <button class="btn" onclick="restoreDefaultProjects()">
+          🔄 Restore Default Projects
+        </button>
+      </div>
+
+      <div class="test-section">
+        <h2>📊 Analysis Summary</h2>
+        <div id="summary" class="summary">
+          <p>Click "Load Current Projects" to see analysis</p>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>🖼️ Projects Preview</h2>
+        <div id="projects-display" class="project-grid">
+          <p>No projects loaded yet</p>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>📋 Expected Results After Fix</h2>
+        <ul>
+          <li>✅ Each project should have a unique image</li>
+          <li>✅ No two projects should share the same image file</li>
+          <li>✅ Images should load correctly without errors</li>
+          <li>✅ Finance project should use project-1.jpg</li>
+          <li>✅ Orizon project should use project-2.png</li>
+          <li>✅ Other projects should have different images</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Load projects from localStorage
+      function loadCurrentProjects() {
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+        analyzeProjects(projects);
+        displayProjects(projects);
+      }
+
+      // Analyze project images for duplicates
+      function analyzeProjects(projects) {
+        const imageCount = {};
+        const duplicates = [];
+        const unique = [];
+        const errors = [];
+
+        projects.forEach((project) => {
+          const image = project.image;
+          if (!image || image === "") {
+            errors.push(project);
+          } else {
+            imageCount[image] = (imageCount[image] || 0) + 1;
+          }
+        });
+
+        projects.forEach((project) => {
+          if (imageCount[project.image] > 1) {
+            duplicates.push(project);
+          } else if (project.image) {
+            unique.push(project);
+          }
+        });
+
+        const summary = document.getElementById("summary");
+        summary.innerHTML = `
+                <div class="summary-item">
+                    <span>📊 Total Projects:</span>
+                    <span>${projects.length}</span>
+                </div>
+                <div class="summary-item">
+                    <span>✅ Unique Images:</span>
+                    <span>${unique.length}</span>
+                </div>
+                <div class="summary-item">
+                    <span>🔄 Duplicate Images:</span>
+                    <span>${duplicates.length}</span>
+                </div>
+                <div class="summary-item">
+                    <span>❌ Missing/Error Images:</span>
+                    <span>${errors.length}</span>
+                </div>
+                <hr>
+                <div class="summary-item">
+                    <span>🎯 Status:</span>
+                    <span>${
+                      duplicates.length === 0 && errors.length === 0
+                        ? "✅ All Good!"
+                        : "⚠️ Needs Fix"
+                    }</span>
+                </div>
+            `;
+      }
+
+      // Display projects visually
+      function displayProjects(projects) {
+        const container = document.getElementById("projects-display");
+
+        if (projects.length === 0) {
+          container.innerHTML = "<p>❌ No projects found</p>";
+          return;
+        }
+
+        const imageCount = {};
+        projects.forEach((project) => {
+          const image = project.image;
+          imageCount[image] = (imageCount[image] || 0) + 1;
+        });
+
+        container.innerHTML = projects
+          .map((project) => {
+            let status = "unique";
+            let statusText = "✅ Unique";
+
+            if (!project.image || project.image === "") {
+              status = "error";
+              statusText = "❌ No Image";
+            } else if (imageCount[project.image] > 1) {
+              status = "duplicate";
+              statusText = "🔄 Duplicate";
+            }
+
+            return `
+                    <div class="project-card">
+                        <h3>${project.title}</h3>
+                        <img src="${project.image}" alt="${project.title}" class="project-image" 
+                             onerror="this.style.border='3px solid red'; this.alt='❌ Image Error';">
+                        <p><strong>Category:</strong> ${project.category}</p>
+                        <p><strong>Image:</strong> ${project.image}</p>
+                        <div class="status ${status}">${statusText}</div>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      // Create test duplicates for testing
+      function createTestDuplicates() {
+        const testProjects = [
+          {
+            id: "test1",
+            title: "Finance",
+            category: "web development",
+            image: "../assets/images/project-1.jpg",
+            description: "Finance app",
+            technologies: ["HTML", "CSS", "JS"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "test2",
+            title: "Orizon",
+            category: "web development",
+            image: "../assets/images/project-1.jpg", // Duplicate!
+            description: "Orizon app",
+            technologies: ["React"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "test3",
+            title: "TestApp1",
+            category: "web design",
+            image: "../assets/images/project-1.jpg", // Duplicate!
+            description: "Test app",
+            technologies: ["Design"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "test4",
+            title: "TestApp2",
+            category: "ui/ux design",
+            image: "", // Missing image!
+            description: "Another test app",
+            technologies: ["UX"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+        ];
+
+        localStorage.setItem(
+          "portfolio_projects",
+          JSON.stringify(testProjects)
+        );
+        alert("✅ Created test projects with duplicate images!");
+        loadCurrentProjects();
+      }
+
+      // Run the image fix algorithm
+      function runImageFix() {
+        let projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+
+        if (projects.length === 0) {
+          alert("❌ No projects to fix");
+          return;
+        }
+
+        const imageMapping = {
+          Finance: "../assets/images/project-1.jpg",
+          Orizon: "../assets/images/project-2.png",
+          Fundo: "../assets/images/project-3.jpg",
+          Brawlhalla: "../assets/images/project-4.png",
+          DSM: "../assets/images/project-5.png",
+          MetaSpark: "../assets/images/project-6.png",
+          Summary: "../assets/images/project-7.png",
+          "Task Management": "../assets/images/project-8.jpg",
+          Arrival: "../assets/images/project-9.png",
+        };
+
+        const availableImages = [
+          "../assets/images/project-1.jpg",
+          "../assets/images/project-2.png",
+          "../assets/images/project-3.jpg",
+          "../assets/images/project-4.png",
+          "../assets/images/project-5.png",
+          "../assets/images/project-6.png",
+          "../assets/images/project-7.png",
+          "../assets/images/project-8.jpg",
+          "../assets/images/project-9.png",
+        ];
+
+        const usedImages = new Set();
+        let fixedCount = 0;
+
+        projects.forEach((project, index) => {
+          let needsFix = false;
+          let newImage = project.image;
+
+          // Check if project has a predefined image mapping
+          if (imageMapping[project.title]) {
+            newImage = imageMapping[project.title];
+          }
+          // Check if image is already used by another project or is broken
+          else if (
+            usedImages.has(project.image) ||
+            !project.image ||
+            project.image.endsWith("project-1.jpg")
+          ) {
+            needsFix = true;
+          }
+
+          // Find unused image
+          if (needsFix) {
+            newImage = availableImages.find((img) => !usedImages.has(img));
+            if (!newImage) {
+              newImage = availableImages[index % availableImages.length];
+            }
+          }
+
+          if (newImage !== project.image) {
+            project.image = newImage;
+            fixedCount++;
+          }
+
+          usedImages.add(newImage);
+        });
+
+        localStorage.setItem("portfolio_projects", JSON.stringify(projects));
+        alert(`✅ Fixed ${fixedCount} projects with duplicate/broken images!`);
+        loadCurrentProjects();
+      }
+
+      function clearAllProjects() {
+        if (confirm("⚠️ Clear all projects?")) {
+          localStorage.removeItem("portfolio_projects");
+          document.getElementById("summary").innerHTML =
+            "<p>✅ All projects cleared</p>";
+          document.getElementById("projects-display").innerHTML =
+            "<p>No projects</p>";
+        }
+      }
+
+      function restoreDefaultProjects() {
+        const defaultProjects = [
+          {
+            id: "1",
+            title: "Finance",
+            category: "web development",
+            image: "../assets/images/project-1.jpg",
+            description: "Modern finance dashboard with analytics",
+            technologies: ["HTML", "CSS", "JavaScript", "Chart.js"],
+            link: "github.com",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "2",
+            title: "Orizon",
+            category: "web development",
+            image: "../assets/images/project-2.png",
+            description: "Sleek web application with modern UI/UX",
+            technologies: ["React", "Node.js", "MongoDB"],
+            link: "https://orizon-demo.com",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "3",
+            title: "Fundo",
+            category: "web design",
+            image: "../assets/images/project-3.jpg",
+            description: "Creative funding platform design",
+            technologies: ["Figma", "Adobe XD"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+        ];
+
+        localStorage.setItem(
+          "portfolio_projects",
+          JSON.stringify(defaultProjects)
+        );
+        alert("✅ Restored default projects!");
+        loadCurrentProjects();
+      }
+
+      // Auto-load on page start
+      window.onload = loadCurrentProjects;
+    </script>
+  </body>
+</html>

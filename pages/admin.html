@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Portfolio Management</title>
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-dashboard">
+      <!-- Admin Header -->
+      <div class="admin-header">
+        <div class="title-area">
+          <h1>Admin Dashboard</h1>
+          <p>Kelola portfolio projects dan contact messages</p>
+        </div>
+
+        <div class="user-info">
+          <div class="user-avatar">A</div>
+          <div>
+            <div id="adminUsername">Loading...</div>
+            <div style="color: var(--light-gray); font-size: 0.9rem">
+              Administrator
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-nav">
+          <button class="nav-btn active" onclick="showSection('dashboard')">
+            <ion-icon name="speedometer-outline"></ion-icon>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-btn" onclick="showSection('projects')">
+            <ion-icon name="briefcase-outline"></ion-icon>
+            <span>Projects</span>
+          </button>
+          <button class="nav-btn" onclick="showSection('contacts')">
+            <ion-icon name="mail-outline"></ion-icon>
+            <span>Contacts</span>
+          </button>
+          <button class="nav-btn" onclick="showSection('blogs')">
+            <ion-icon name="newspaper-outline"></ion-icon>
+            <span>Blogs</span>
+          </button>
+          <button class="nav-btn" onclick="showSection('settings')">
+            <ion-icon name="settings-outline"></ion-icon>
+            <span>Settings</span>
+          </button>
+          <button class="logout-btn" onclick="handleLogout()">
+            <ion-icon name="log-out-outline"></ion-icon>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin Content -->
+      <div class="admin-content">
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="section active">
+          <div class="admin-card">
+            <h2>Dashboard Overview</h2>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-number" id="totalProjects">0</div>
+                <div class="stat-label">Total Projects</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="totalContacts">0</div>
+                <div class="stat-label">Total Messages</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="unreadMessages">0</div>
+                <div class="stat-label">Unread Messages</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="todayMessages">0</div>
+                <div class="stat-label">Today's Messages</div>
+              </div>
+            </div>
+
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+              ">
+              <div class="admin-card">
+                <h3>Recent Projects</h3>
+                <div id="recentProjects"></div>
+              </div>
+              <div class="admin-card">
+                <h3>Recent Messages</h3>
+                <div id="recentMessages"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects Section -->
+        <div id="projects-section" class="section" style="display: none">
+          <div class="admin-card">
+            <h2>Project Management</h2>
+
+            <div class="crud-actions">
+              <button class="crud-btn" onclick="showAddProjectModal()">
+                <ion-icon name="add-outline"></ion-icon>
+                Add New Project
+              </button>
+              <button class="crud-btn success" onclick="exportProjects()">
+                <ion-icon name="download-outline"></ion-icon>
+                Export Projects
+              </button>
+              <input
+                type="file"
+                id="importProjectFile"
+                accept=".json"
+                style="display: none"
+                onchange="importProjects(this)" />
+              <button
+                class="crud-btn success"
+                onclick="document.getElementById('importProjectFile').click()">
+                <ion-icon name="cloud-upload-outline"></ion-icon>
+                Import Projects
+              </button>
+              <button
+                class="crud-btn warning"
+                onclick="fixDuplicateImages()"
+                title="Fix projects with duplicate or broken images">
+                <ion-icon name="image-outline"></ion-icon>
+                Fix Duplicate Images
+              </button>
+              <button
+                class="crud-btn warning"
+                onclick="fixImagePaths()"
+                title="Fix inconsistent image paths">
+                <ion-icon name="link-outline"></ion-icon>
+                Fix Image Paths
+              </button>
+            </div>
+
+            <input
+              type="text"
+              class="search-bar"
+              placeholder="Search projects..."
+              onkeyup="searchProjects(this.value)" />
+
+            <div class="filter-tabs">
+              <div class="filter-tab active" onclick="filterProjects('all')">
+                All
+              </div>
+              <div
+                class="filter-tab"
+                onclick="filterProjects('web development')">
+                Web Development
+              </div>
+              <div class="filter-tab" onclick="filterProjects('web design')">
+                Web Design
+              </div>
+              <div class="filter-tab" onclick="filterProjects('ui/ux design')">
+                UI/UX Design
+              </div>
+            </div>
+
+            <div id="projectsTable"></div>
+          </div>
+        </div>
+
+        <!-- Contacts Section -->
+        <div id="contacts-section" class="section" style="display: none">
+          <div class="admin-card">
+            <h2>Contact Messages</h2>
+
+            <div class="crud-actions">
+              <button class="crud-btn success" onclick="exportContacts()">
+                <ion-icon name="download-outline"></ion-icon>
+                Export Messages
+              </button>
+              <button class="crud-btn danger" onclick="clearAllMessages()">
+                <ion-icon name="trash-outline"></ion-icon>
+                Clear All Messages
+              </button>
+            </div>
+
+            <input
+              type="text"
+              class="search-bar"
+              placeholder="Search messages..."
+              onkeyup="searchMessages(this.value)" />
+
+            <div class="filter-tabs">
+              <div class="filter-tab active" onclick="filterMessages('all')">
+                All
+              </div>
+              <div class="filter-tab" onclick="filterMessages('unread')">
+                Unread
+              </div>
+              <div class="filter-tab" onclick="filterMessages('read')">
+                Read
+              </div>
+              <div class="filter-tab" onclick="filterMessages('today')">
+                Today
+              </div>
+            </div>
+
+            <div id="messagesTable"></div>
+          </div>
+        </div>
+
+        <!-- Blog Management Section -->
+        <div id="blogs-section" class="section" style="display: none">
+          <div class="admin-card">
+            <h2>Blog Management</h2>
+
+            <div class="crud-actions">
+              <button class="crud-btn" onclick="showAddBlogModal()">
+                <ion-icon name="add-outline"></ion-icon>
+                Add New Blog Post
+              </button>
+              <button class="crud-btn success" onclick="exportBlogs()">
+                <ion-icon name="download-outline"></ion-icon>
+                Export Blogs
+              </button>
+              <input
+                type="file"
+                id="importBlogFile"
+                accept=".json"
+                style="display: none"
+                onchange="importBlogs(this)" />
+              <button
+                class="crud-btn success"
+                onclick="document.getElementById('importBlogFile').click()">
+                <ion-icon name="cloud-upload-outline"></ion-icon>
+                Import Blogs
+              </button>
+            </div>
+
+            <input
+              type="text"
+              class="search-bar"
+              placeholder="Search blogs..."
+              onkeyup="searchBlogs(this.value)" />
+
+            <div class="filter-tabs">
+              <div class="filter-tab active" onclick="filterBlogs('all')">
+                All
+              </div>
+              <div class="filter-tab" onclick="filterBlogs('web development')">
+                Web Development
+              </div>
+              <div class="filter-tab" onclick="filterBlogs('profile')">
+                Profile
+              </div>
+              <div class="filter-tab" onclick="filterBlogs('technology')">
+                Technology
+              </div>
+            </div>
+
+            <div id="blogsTable"></div>
+          </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings-section" class="section" style="display: none">
+          <div class="admin-card">
+            <h2>Settings</h2>
+
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+              ">
+              <div class="admin-card">
+                <h3>Account Settings</h3>
+                <button class="crud-btn" onclick="showChangePasswordModal()">
+                  Change Password
+                </button>
+              </div>
+              <div class="admin-card">
+                <h3>Data Management</h3>
+                <button class="crud-btn success" onclick="backupAllData()">
+                  Backup All Data
+                </button>
+                <button class="crud-btn danger" onclick="clearAllData()">
+                  Clear All Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Project Modal -->
+    <div id="projectModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="projectModalTitle">Add New Project</h3>
+          <button class="close-btn" onclick="closeModal('projectModal')">
+            &times;
+          </button>
+        </div>
+        <form id="projectForm">
+          <input type="hidden" id="projectId" />
+          <div class="form-group">
+            <label for="projectTitle">Project Title</label>
+            <input type="text" id="projectTitle" required />
+          </div>
+          <div class="form-group">
+            <label for="projectCategory">Category</label>
+            <select id="projectCategory" required>
+              <option value="">Select Category</option>
+              <option value="web development">Web Development</option>
+              <option value="web design">Web Design</option>
+              <option value="ui/ux design">UI/UX Design</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="projectImage">Image URL or Path</label>
+            <input
+              type="text"
+              id="projectImage"
+              required
+              placeholder="project-1.jpg or /assets/images/project-1.jpg or https://example.com/image.jpg" />
+            <small style="color: var(--light-gray); font-size: 0.9rem">
+              You can use relative paths (../assets/images/...) or full URLs
+              (https://...)
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="projectDescription">Description</label>
+            <textarea id="projectDescription" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="projectTechnologies">
+              Technologies (comma separated)
+            </label>
+            <input
+              type="text"
+              id="projectTechnologies"
+              placeholder="HTML, CSS, JavaScript" />
+          </div>
+          <div class="form-group">
+            <label for="projectLink">Project Link</label>
+            <input
+              type="text"
+              id="projectLink"
+              placeholder="e.g., github.com/user/repo or https://example.com" />
+            <small style="color: var(--light-gray); font-size: 0.9rem">
+              You can enter domain names (github.com) or full URLs (https://...)
+            </small>
+          </div>
+          <div class="crud-actions">
+            <button type="submit" class="crud-btn">Save Project</button>
+            <button
+              type="button"
+              class="crud-btn danger"
+              onclick="closeModal('projectModal')">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add/Edit Blog Modal -->
+    <div id="blogModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="blogModalTitle">Add New Blog Post</h3>
+          <button class="close-btn" onclick="closeModal('blogModal')">
+            &times;
+          </button>
+        </div>
+        <form id="blogForm">
+          <input type="hidden" id="blogId" />
+          <div class="form-group">
+            <label for="blogTitle">Blog Title</label>
+            <input type="text" id="blogTitle" required />
+          </div>
+          <div class="form-group">
+            <label for="blogCategory">Category</label>
+            <select id="blogCategory" required>
+              <option value="">Select Category</option>
+              <option value="web development">Web Development</option>
+              <option value="profile">Profile</option>
+              <option value="technology">Technology</option>
+              <option value="tutorial">Tutorial</option>
+              <option value="career">Career</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="blogImage">Image URL or Path</label>
+            <input
+              type="text"
+              id="blogImage"
+              required
+              placeholder="blog-1.jpg or /assets/images/blog-1.jpg or https://example.com/image.jpg" />
+            <small style="color: var(--light-gray); font-size: 0.9rem">
+              You can use relative paths (../assets/images/...) or full URLs
+              (https://...)
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="blogDate">Publication Date</label>
+            <input type="date" id="blogDate" required />
+          </div>
+          <div class="form-group">
+            <label for="blogContent">Blog Content</label>
+            <textarea id="blogContent" rows="6" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="blogExternalLink">External Link (Optional)</label>
+            <input
+              type="text"
+              id="blogExternalLink"
+              placeholder="e.g., medium.com/article or https://example.com/blog" />
+            <small style="color: var(--light-gray); font-size: 0.9rem">
+              If this blog post links to an external site, enter the URL here
+            </small>
+          </div>
+          <div class="crud-actions">
+            <button type="submit" class="crud-btn">Save Blog Post</button>
+            <button
+              type="button"
+              class="crud-btn danger"
+              onclick="closeModal('blogModal')">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Load Scripts -->
+    <script src="../assets/js/simple-auth.js"></script>
+    <script src="../assets/js/crud-projects.js"></script>
+    <script src="../assets/js/crud-contact.js"></script>
+    <script src="../assets/js/crud-blogs.js"></script>
+    <script src="../assets/js/admin.js"></script>
+
+    <!-- ionicon link -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  </body>
+</html>

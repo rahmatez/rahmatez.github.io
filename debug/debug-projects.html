@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Projects Data</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #1a1a1a;
+        color: #fff;
+      }
+      .debug-container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+      .project-card {
+        background: #2a2a2a;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #ff7b00;
+      }
+      .project-image {
+        width: 200px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+      .debug-info {
+        background: #333;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+      .action-buttons {
+        margin: 20px 0;
+      }
+      .btn {
+        background: #ff7b00;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 0 10px;
+      }
+      .btn:hover {
+        background: #e56a00;
+      }
+      .fix-btn {
+        background: #4caf50;
+      }
+      .fix-btn:hover {
+        background: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>🔍 Debug Projects Data</h1>
+
+      <div class="action-buttons">
+        <button class="btn" onclick="loadProjects()">Load Projects</button>
+        <button class="btn fix-btn" onclick="fixDuplicateImages()">
+          Fix Duplicate Images
+        </button>
+        <button class="btn" onclick="clearData()">Clear All Data</button>
+        <button class="btn" onclick="addSampleProjects()">
+          Add Sample Projects
+        </button>
+      </div>
+
+      <div id="debug-output"></div>
+      <div id="projects-display"></div>
+    </div>
+
+    <script>
+      function loadProjects() {
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+
+        document.getElementById("debug-output").innerHTML = `
+                <div class="debug-info">
+                    <strong>📊 Projects Data (${
+                      projects.length
+                    } projects):</strong>
+                    ${JSON.stringify(projects, null, 2)}
+                </div>
+            `;
+
+        displayProjectsVisually(projects);
+      }
+
+      function displayProjectsVisually(projects) {
+        const container = document.getElementById("projects-display");
+
+        if (projects.length === 0) {
+          container.innerHTML = "<p>❌ No projects found in localStorage</p>";
+          return;
+        }
+
+        container.innerHTML = projects
+          .map(
+            (project) => `
+                <div class="project-card">
+                    <h3>📁 ${project.title}</h3>
+                    <p><strong>Category:</strong> ${project.category}</p>
+                    <p><strong>Image Path:</strong> ${project.image}</p>
+                    <img src="${project.image}" 
+                         alt="${project.title}" 
+                         class="project-image"
+                         onerror="this.style.border='3px solid red'; this.alt='❌ Image not found: ' + this.src;">
+                    <p><strong>Description:</strong> ${project.description}</p>
+                    <p><strong>Link:</strong> ${project.link}</p>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function fixDuplicateImages() {
+        let projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+
+        if (projects.length === 0) {
+          alert("❌ No projects found to fix");
+          return;
+        }
+
+        // Fix duplicate images by assigning unique images
+        const imageMapping = {
+          Finance: "../assets/images/project-1.jpg",
+          Orizon: "../assets/images/project-2.png",
+          Fundo: "../assets/images/project-3.jpg",
+          Brawlhalla: "../assets/images/project-4.png",
+          DSM: "../assets/images/project-5.png",
+          MetaSpark: "../assets/images/project-6.png",
+          Summary: "../assets/images/project-7.png",
+          "Task Management": "../assets/images/project-8.jpg",
+          Arrival: "../assets/images/project-9.png",
+        };
+
+        projects = projects.map((project) => {
+          if (imageMapping[project.title]) {
+            project.image = imageMapping[project.title];
+          } else {
+            // For custom projects, keep existing image or assign default
+            if (
+              !project.image ||
+              project.image === "../assets/images/project-1.jpg"
+            ) {
+              const availableImages = Object.values(imageMapping);
+              const randomImage =
+                availableImages[
+                  Math.floor(Math.random() * availableImages.length)
+                ];
+              project.image = randomImage;
+            }
+          }
+          return project;
+        });
+
+        localStorage.setItem("portfolio_projects", JSON.stringify(projects));
+        alert("✅ Fixed duplicate images! Reloading...");
+        loadProjects();
+      }
+
+      function clearData() {
+        if (confirm("⚠️ Are you sure you want to clear all projects data?")) {
+          localStorage.removeItem("portfolio_projects");
+          document.getElementById("debug-output").innerHTML =
+            "<p>✅ All projects data cleared</p>";
+          document.getElementById("projects-display").innerHTML = "";
+        }
+      }
+
+      function addSampleProjects() {
+        const sampleProjects = [
+          {
+            id: "1",
+            title: "Finance",
+            category: "web development",
+            image: "../assets/images/project-1.jpg",
+            description: "A modern finance dashboard with analytics",
+            technologies: ["HTML", "CSS", "JavaScript"],
+            link: "github.com",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "2",
+            title: "Orizon",
+            category: "web development",
+            image: "../assets/images/project-2.png",
+            description: "A sleek web application for modern businesses",
+            technologies: ["React", "Node.js", "MongoDB"],
+            link: "https://orizon-demo.com",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "3",
+            title: "Fundo",
+            category: "web design",
+            image: "../assets/images/project-3.jpg",
+            description: "Creative web design for funding platform",
+            technologies: ["Figma", "Adobe XD"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+        ];
+
+        localStorage.setItem(
+          "portfolio_projects",
+          JSON.stringify(sampleProjects)
+        );
+        alert("✅ Sample projects added!");
+        loadProjects();
+      }
+
+      // Auto-load on page load
+      window.onload = loadProjects;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog Display Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .test-container {
+        border: 1px solid #ccc;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
+      .action-btn {
+        background-color: #4caf50;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 5px;
+        margin-bottom: 5px;
+      }
+      .action-btn.danger {
+        background-color: #f44336;
+      }
+      .blog-preview {
+        border: 1px solid #eee;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 4px;
+      }
+      pre {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Blog Display Test</h1>
+
+    <div class="test-container">
+      <h2>Current LocalStorage Blog Data</h2>
+      <button class="action-btn" onclick="displayCurrentBlogs()">
+        Show Current Blog Data
+      </button>
+      <button class="action-btn danger" onclick="clearBlogData()">
+        Clear Blog Data
+      </button>
+      <pre id="current-blogs"></pre>
+    </div>
+
+    <div class="test-container">
+      <h2>Test Blog Creation</h2>
+      <button class="action-btn" onclick="createTestBlog()">
+        Add Test Blog
+      </button>
+      <button class="action-btn" onclick="createMultipleTestBlogs()">
+        Add 3 Test Blogs
+      </button>
+      <div id="created-blog" class="blog-preview"></div>
+    </div>
+
+    <div class="test-container">
+      <h2>Blog Display Test</h2>
+      <p>
+        Tests whether the blog display script correctly handles the blog data.
+      </p>
+      <div>
+        <button class="action-btn" onclick="simulateDisplayBlogs()">
+          Simulate Blog Display
+        </button>
+        <div id="blog-display-test"></div>
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>Links</h2>
+      <p>Open these pages to test the blog functionality:</p>
+      <a href="../pages/blog.html" target="_blank">Blog Page</a>
+      |
+      <a href="../pages/admin.html" target="_blank">Admin Panel</a>
+    </div>
+
+    <!-- Load the scripts used in the portfolio -->
+    <script src="../assets/js/crud-blogs.js"></script>
+    <script>
+      // Display current blog data from localStorage
+      function displayCurrentBlogs() {
+        const blogs = blogManager.getAllBlogs();
+        document.getElementById("current-blogs").textContent = JSON.stringify(
+          blogs,
+          null,
+          2
+        );
+      }
+
+      // Clear blog data from localStorage
+      function clearBlogData() {
+        if (
+          confirm(
+            "Are you sure you want to clear all blog data? This cannot be undone."
+          )
+        ) {
+          localStorage.removeItem("portfolio_blogs");
+          document.getElementById("current-blogs").textContent =
+            "Blog data cleared!";
+        }
+      }
+
+      // Create a test blog
+      function createTestBlog() {
+        const blogData = {
+          title: "Test Blog " + new Date().toLocaleTimeString(),
+          category: "Test Category",
+          image: "../assets/images/blog-1.jpg",
+          content:
+            "This is a test blog post created for debugging purposes. This content should appear on the blog page.",
+          externalLink: "",
+          date: new Date().toISOString(),
+        };
+
+        const createdBlog = blogManager.createBlog(blogData);
+        document.getElementById("created-blog").innerHTML = `
+        <h3>${createdBlog.title}</h3>
+        <p><strong>Category:</strong> ${createdBlog.category}</p>
+        <p><strong>Content:</strong> ${createdBlog.content}</p>
+        <p><strong>Date:</strong> ${new Date(
+          createdBlog.date
+        ).toLocaleString()}</p>
+        <p><strong>ID:</strong> ${createdBlog.id}</p>
+      `;
+
+        displayCurrentBlogs();
+      }
+
+      // Create multiple test blogs
+      function createMultipleTestBlogs() {
+        const categories = ["Web Development", "Technology", "Profile"];
+        const images = [
+          "../assets/images/blog-1.jpg",
+          "../assets/images/blog-2.jpg",
+          "../assets/images/blog-3.jpg",
+        ];
+
+        for (let i = 0; i < 3; i++) {
+          const blogData = {
+            title: `Test Blog ${i + 1} - ${new Date().toLocaleTimeString()}`,
+            category: categories[i % categories.length],
+            image: images[i % images.length],
+            content: `This is test blog post #${
+              i + 1
+            } created for debugging. This content should appear on the blog page.`,
+            externalLink: "",
+            date: new Date().toISOString(),
+          };
+
+          blogManager.createBlog(blogData);
+        }
+
+        document.getElementById("created-blog").innerHTML =
+          "<p>Created 3 test blog posts!</p>";
+        displayCurrentBlogs();
+      }
+
+      // Simulate the blog display functionality
+      function simulateDisplayBlogs() {
+        const blogContainer = document.getElementById("blog-display-test");
+        blogContainer.innerHTML = "<h3>Blog Display Simulation</h3>";
+
+        // Get blogs from localStorage
+        const storageKey = "portfolio_blogs";
+        const storedBlogs = localStorage.getItem(storageKey);
+
+        if (!storedBlogs) {
+          blogContainer.innerHTML += "<p>No blogs found in localStorage</p>";
+          return;
+        }
+
+        try {
+          const blogs = JSON.parse(storedBlogs);
+
+          if (!blogs || blogs.length === 0) {
+            blogContainer.innerHTML += "<p>No blogs in localStorage array</p>";
+            return;
+          }
+
+          // Sort blogs by date (newest first)
+          const sortedBlogs = [...blogs].sort(
+            (a, b) => new Date(b.date) - new Date(a.date)
+          );
+
+          blogContainer.innerHTML += `<p>Found ${sortedBlogs.length} blogs in localStorage</p>`;
+
+          // Show the first 2 blogs
+          const previewBlogs = sortedBlogs.slice(0, 2);
+          previewBlogs.forEach((blog) => {
+            const blogDate = new Date(blog.date);
+            const month = blogDate.toLocaleString("en-US", { month: "short" });
+            const day = blogDate.getDate();
+            const year = blogDate.getFullYear();
+
+            blogContainer.innerHTML += `
+            <div class="blog-preview">
+              <h4>${blog.title}</h4>
+              <p><strong>Category:</strong> ${blog.category}</p>
+              <p><strong>Date:</strong> ${month} ${day}, ${year}</p>
+              <p><strong>Content:</strong> ${blog.content.substring(0, 100)}${
+              blog.content.length > 100 ? "..." : ""
+            }</p>
+            </div>
+          `;
+          });
+        } catch (error) {
+          blogContainer.innerHTML += `<p>Error: ${error.message}</p>`;
+        }
+      }
+
+      // Display current blog data on page load
+      document.addEventListener("DOMContentLoaded", displayCurrentBlogs);
+    </script>
+  </body>
+</html>

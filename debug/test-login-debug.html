@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Debug Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #1a1a1a;
+        color: #fff;
+      }
+      .section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #333;
+        border-radius: 8px;
+        background: #2a2a2a;
+      }
+      button {
+        margin: 5px;
+        padding: 10px 15px;
+        background: #007acc;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #005a9a;
+      }
+      input {
+        margin: 5px;
+        padding: 8px;
+        border: 1px solid #555;
+        border-radius: 4px;
+        background: #333;
+        color: white;
+        width: 200px;
+      }
+      .output {
+        background: #000;
+        padding: 10px;
+        border-radius: 4px;
+        font-family: monospace;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Login System Debug Test</h1>
+
+    <div class="section">
+      <h3>1. Check AuthManager Status</h3>
+      <button onclick="checkAuthManager()">Check AuthManager</button>
+      <button onclick="checkStorage()">Check Storage</button>
+      <button onclick="clearAllStorage()">Clear Storage</button>
+    </div>
+
+    <div class="section">
+      <h3>2. Test Login</h3>
+      <input
+        type="text"
+        id="testUsername"
+        placeholder="Username"
+        value="admin" />
+      <input
+        type="password"
+        id="testPassword"
+        placeholder="Password"
+        value="rahmatez2024" />
+      <button onclick="testLogin()">Test Login</button>
+      <button onclick="checkLoginStatus()">Check Login Status</button>
+    </div>
+
+    <div class="section">
+      <h3>3. Debug Output</h3>
+      <div id="output" class="output">Ready for testing...\n</div>
+      <button onclick="clearOutput()">Clear Output</button>
+    </div>
+
+    <div class="section">
+      <h3>4. Navigation</h3>
+      <button onclick="goToLogin()">Go to Login Page</button>
+      <button onclick="goToAdmin()">Go to Admin Page</button>
+    </div>
+
+    <script src="assets/js/auth-manager.js"></script>
+    <script>
+      const output = document.getElementById("output");
+
+      function log(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        output.textContent += `[${timestamp}] ${message}\n`;
+        output.scrollTop = output.scrollHeight;
+        console.log(message);
+      }
+
+      function clearOutput() {
+        output.textContent = "";
+      }
+
+      function checkAuthManager() {
+        log("=== Checking AuthManager ===");
+
+        if (typeof AuthManager === "undefined") {
+          log("❌ AuthManager class not found");
+          return;
+        }
+        log("✅ AuthManager class found");
+
+        if (typeof authManager === "undefined") {
+          log("❌ authManager instance not found");
+          return;
+        }
+        log("✅ authManager instance found");
+
+        log("AuthManager methods:");
+        log("- login: " + typeof authManager.login);
+        log("- isAuthenticated: " + typeof authManager.isAuthenticated);
+        log("- getSession: " + typeof authManager.getSession);
+        log("- logout: " + typeof authManager.logout);
+      }
+
+      function checkStorage() {
+        log("=== Checking Storage ===");
+
+        const portfolioAuth = localStorage.getItem("portfolio_auth");
+        const portfolioSession = localStorage.getItem("portfolio_session");
+        const portfolioToken = sessionStorage.getItem("portfolio_token");
+
+        log(
+          "portfolio_auth in localStorage: " +
+            (portfolioAuth ? "found" : "not found")
+        );
+        if (portfolioAuth) {
+          try {
+            const parsed = JSON.parse(portfolioAuth);
+            log("  - username: " + parsed.username);
+            log("  - email: " + parsed.email);
+            log("  - role: " + parsed.role);
+          } catch (e) {
+            log("  - Error parsing: " + e.message);
+          }
+        }
+
+        log(
+          "portfolio_session in localStorage: " +
+            (portfolioSession ? "found" : "not found")
+        );
+        if (portfolioSession) {
+          try {
+            const parsed = JSON.parse(portfolioSession);
+            log("  - username: " + parsed.username);
+            log("  - loginTime: " + parsed.loginTime);
+            log("  - token: " + (parsed.token ? "present" : "missing"));
+          } catch (e) {
+            log("  - Error parsing: " + e.message);
+          }
+        }
+
+        log(
+          "portfolio_token in sessionStorage: " +
+            (portfolioToken ? "found" : "not found")
+        );
+      }
+
+      function clearAllStorage() {
+        localStorage.clear();
+        sessionStorage.clear();
+        log("✅ All storage cleared");
+      }
+
+      function testLogin() {
+        log("=== Testing Login ===");
+
+        const username = document.getElementById("testUsername").value;
+        const password = document.getElementById("testPassword").value;
+
+        log("Attempting login with:");
+        log("Username: " + username);
+        log("Password: " + password);
+
+        if (!authManager) {
+          log("❌ authManager not available");
+          return;
+        }
+
+        authManager
+          .login(username, password)
+          .then((sessionData) => {
+            log("✅ Login successful!");
+            log("Session data: " + JSON.stringify(sessionData, null, 2));
+          })
+          .catch((error) => {
+            log("❌ Login failed: " + error.message);
+          });
+      }
+
+      function checkLoginStatus() {
+        log("=== Checking Login Status ===");
+
+        if (!authManager) {
+          log("❌ authManager not available");
+          return;
+        }
+
+        const isLoggedIn = authManager.isLoggedIn();
+        log("Is logged in: " + isLoggedIn);
+
+        const session = authManager.getSession();
+        if (session) {
+          log("Current session: " + JSON.stringify(session, null, 2));
+        } else {
+          log("No active session");
+        }
+      }
+
+      function goToLogin() {
+        window.location.href = "pages/login.html";
+      }
+
+      function goToAdmin() {
+        window.location.href = "pages/admin.html";
+      }
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        log("Page loaded, initializing...");
+        checkAuthManager();
+      });
+    </script>
+  </body>
+</html>

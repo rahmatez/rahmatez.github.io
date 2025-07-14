@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .test-step {
+        background: #2a2a2a;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #4caf50;
+      }
+      .test-step.error {
+        border-left-color: #f44336;
+      }
+      .test-step.warning {
+        border-left-color: #ff9800;
+      }
+      .code {
+        background: #1a1a1a;
+        padding: 10px;
+        border-radius: 4px;
+        font-family: monospace;
+        margin: 10px 0;
+      }
+      .button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .button:hover {
+        background: #45a049;
+      }
+      .button.orange {
+        background: #ff9800;
+      }
+      .button.orange:hover {
+        background: #e68900;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🎛️ Admin Dashboard Test Guide</h1>
+
+      <div class="test-step">
+        <h3>📋 Test Checklist untuk Admin Dashboard</h3>
+        <p>
+          Panduan lengkap untuk menguji semua fitur admin dashboard yang baru
+          dibuat.
+        </p>
+      </div>
+
+      <div class="test-step">
+        <h3>🔐 1. Test Authentication</h3>
+        <p><strong>Login Credentials:</strong></p>
+        <div class="code">
+          Username: admin
+          <br />
+          Password: rahmatez2024
+        </div>
+        <p><strong>Steps:</strong></p>
+        <ol>
+          <li>
+            Buka halaman
+            <code>project.html</code>
+            atau
+            <code>contact.html</code>
+          </li>
+          <li>Klik tombol "Login"</li>
+          <li>Masukkan credentials di atas</li>
+          <li>Setelah login berhasil, pastikan tombol "Dashboard" muncul</li>
+        </ol>
+        <button
+          class="button"
+          onclick="window.open('../pages/project.html', '_blank')">
+          Open Project Page
+        </button>
+        <button
+          class="button"
+          onclick="window.open('../pages/contact.html', '_blank')">
+          Open Contact Page
+        </button>
+      </div>
+
+      <div class="test-step">
+        <h3>🎛️ 2. Test Admin Dashboard Access</h3>
+        <p><strong>Steps:</strong></p>
+        <ol>
+          <li>Setelah login, klik tombol orange "Dashboard"</li>
+          <li>Halaman admin dashboard akan terbuka</li>
+          <li>Pastikan semua statistik muncul (Projects, Messages, dll)</li>
+          <li>
+            Pastikan navigasi (Dashboard, Projects, Contacts, Settings)
+            berfungsi
+          </li>
+        </ol>
+        <button
+          class="button orange"
+          onclick="window.open('../pages/admin.html', '_blank')">
+          Open Admin Dashboard
+        </button>
+      </div>
+
+      <div class="test-step">
+        <h3>📊 3. Test Dashboard Overview</h3>
+        <p><strong>Fitur yang harus ditest:</strong></p>
+        <ul>
+          <li>✅ Total Projects count</li>
+          <li>✅ Total Messages count</li>
+          <li>✅ Unread Messages count</li>
+          <li>✅ Today's Messages count</li>
+          <li>✅ Recent Projects list</li>
+          <li>✅ Recent Messages list</li>
+        </ul>
+      </div>
+
+      <div class="test-step">
+        <h3>📁 4. Test Project Management</h3>
+        <p><strong>Fitur CRUD Projects:</strong></p>
+        <ul>
+          <li>✅ Add New Project (dengan form modal)</li>
+          <li>✅ Edit Project (data ter-populate di form)</li>
+          <li>✅ Delete Project (dengan konfirmasi)</li>
+          <li>✅ Search Projects (real-time search)</li>
+          <li>✅ Filter by Category (All, Web Dev, Web Design, UI/UX)</li>
+          <li>✅ Export Projects (download JSON file)</li>
+          <li>✅ Import Projects (upload JSON file)</li>
+        </ul>
+        <p><strong>Test Data untuk Add Project:</strong></p>
+        <div class="code">
+          Title: Test Project Dashboard
+          <br />
+          Category: web development
+          <br />
+          Image URL: https://via.placeholder.com/400x300
+          <br />
+          Description: Project test dari admin dashboard
+          <br />
+          Technologies: HTML, CSS, JavaScript, Admin UI
+          <br />
+          Project Link: https://example.com
+        </div>
+      </div>
+
+      <div class="test-step">
+        <h3>📧 5. Test Contact Management</h3>
+        <p><strong>Fitur Contact Messages:</strong></p>
+        <ul>
+          <li>✅ View All Messages (dalam table format)</li>
+          <li>✅ Mark as Read/Unread</li>
+          <li>✅ Delete Messages</li>
+          <li>✅ Search Messages (by name, email, atau content)</li>
+          <li>✅ Filter Messages (All, Unread, Read, Today)</li>
+          <li>✅ Export Messages (download JSON file)</li>
+          <li>✅ Clear All Messages (dengan konfirmasi)</li>
+        </ul>
+        <p>
+          <strong>Catatan:</strong>
+          Pastikan ada test messages terlebih dahulu dari halaman contact form.
+        </p>
+      </div>
+
+      <div class="test-step">
+        <h3>⚙️ 6. Test Settings</h3>
+        <p><strong>Fitur Settings:</strong></p>
+        <ul>
+          <li>✅ Change Password (modal form)</li>
+          <li>✅ Backup All Data (download portfolio-backup.json)</li>
+          <li>✅ Clear All Data (dengan konfirmasi)</li>
+        </ul>
+      </div>
+
+      <div class="test-step">
+        <h3>📱 7. Test Responsive Design</h3>
+        <p><strong>Test di berbagai screen size:</strong></p>
+        <ul>
+          <li>✅ Desktop (1920px+)</li>
+          <li>✅ Laptop (1366px)</li>
+          <li>✅ Tablet (768px)</li>
+          <li>✅ Mobile (480px)</li>
+        </ul>
+        <p>
+          Pastikan layout menyesuaikan dengan baik dan semua fungsi tetap dapat
+          diakses.
+        </p>
+      </div>
+
+      <div class="test-step">
+        <h3>🔒 8. Test Security</h3>
+        <p><strong>Test Authentication Protection:</strong></p>
+        <ul>
+          <li>✅ Dashboard hanya bisa diakses setelah login</li>
+          <li>✅ Redirect ke project.html jika belum login</li>
+          <li>✅ Logout berfungsi dengan baik</li>
+          <li>✅ Session tetap aktif setelah refresh page</li>
+          <li>✅ Session expired setelah 24 jam</li>
+        </ul>
+      </div>
+
+      <div class="test-step">
+        <h3>🎯 9. Test Data Integration</h3>
+        <p><strong>Test integrasi dengan data existing:</strong></p>
+        <ul>
+          <li>✅ Data projects dari localStorage sync dengan dashboard</li>
+          <li>✅ Data contact messages dari IndexedDB sync dengan dashboard</li>
+          <li>✅ Changes di dashboard reflect ke halaman utama</li>
+          <li>✅ Export/Import berfungsi dengan data format yang benar</li>
+        </ul>
+      </div>
+
+      <div class="test-step">
+        <h3>⚡ 10. Test Performance</h3>
+        <p><strong>Test performa dan user experience:</strong></p>
+        <ul>
+          <li>✅ Loading time dashboard < 2 detik</li>
+          <li>✅ Search real-time tidak lag</li>
+          <li>✅ Modal open/close smooth</li>
+          <li>✅ Data refresh without page reload</li>
+          <li>✅ Hover effects dan animations berfungsi</li>
+        </ul>
+      </div>
+
+      <div class="test-step error">
+        <h3>🐛 Common Issues & Solutions</h3>
+        <div class="code">
+          Issue: Dashboard tidak bisa diakses
+          <br />
+          Solution: Pastikan sudah login terlebih dahulu
+          <br />
+          <br />
+
+          Issue: Data tidak sync
+          <br />
+          Solution: Refresh browser atau clear localStorage
+          <br />
+          <br />
+
+          Issue: Modal tidak muncul
+          <br />
+          Solution: Check console errors dan pastikan script loaded
+          <br />
+          <br />
+
+          Issue: Export tidak berfungsi
+          <br />
+          Solution: Check browser support untuk download file
+        </div>
+      </div>
+
+      <div class="test-step">
+        <h3>✅ Test Completion Checklist</h3>
+        <p>Centang setelah semua test berhasil:</p>
+        <ul>
+          <li>☐ Authentication system working</li>
+          <li>☐ Dashboard statistics accurate</li>
+          <li>☐ Project CRUD operations working</li>
+          <li>☐ Contact management working</li>
+          <li>☐ Settings functions working</li>
+          <li>☐ Responsive design working</li>
+          <li>☐ Security protection working</li>
+          <li>☐ Data integration working</li>
+          <li>☐ Performance acceptable</li>
+          <li>☐ No console errors</li>
+        </ul>
+      </div>
+
+      <div class="test-step">
+        <h3>🎉 Success Criteria</h3>
+        <p>Dashboard dianggap berhasil jika:</p>
+        <ul>
+          <li>✅ Semua fitur CRUD berfungsi dengan baik</li>
+          <li>✅ UI responsive dan user-friendly</li>
+          <li>✅ Data aman dan ter-proteksi authentication</li>
+          <li>✅ Export/Import berfungsi untuk backup</li>
+          <li>✅ Statistics akurat dan real-time</li>
+          <li>✅ Tidak ada errors di console</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Simple test utilities
+      function testDashboardAccess() {
+        if (window.authManager && window.authManager.isLoggedIn()) {
+          alert("✅ Authentication OK - Dashboard dapat diakses");
+          window.open("../pages/admin.html", "_blank");
+        } else {
+          alert("❌ Please login first");
+          window.open("../pages/project.html", "_blank");
+        }
+      }
+
+      function testDataIntegrity() {
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+        console.log("📁 Projects Data:", projects);
+
+        // Test IndexedDB for contacts
+        const request = indexedDB.open("PortfolioContactDB");
+        request.onsuccess = function (event) {
+          console.log("📧 Contact Database accessible");
+          alert(
+            "✅ Data integrity check completed - check console for details"
+          );
+        };
+        request.onerror = function (event) {
+          console.error("❌ Contact Database error:", event);
+          alert("❌ Contact database issue - check console");
+        };
+      }
+
+      // Auto-run basic tests on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("🎛️ Admin Dashboard Test Page Loaded");
+        console.log("🔧 Available Test Functions:");
+        console.log("  - testDashboardAccess()");
+        console.log("  - testDataIntegrity()");
+
+        // Check if scripts are loaded
+        if (typeof Storage !== "undefined") {
+          console.log("✅ localStorage support available");
+        }
+        if (typeof indexedDB !== "undefined") {
+          console.log("✅ IndexedDB support available");
+        }
+      });
+    </script>
+  </body>
+</html>

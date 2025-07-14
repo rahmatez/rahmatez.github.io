@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Project URL Fix</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .test-case {
+        background: #2a2a2a;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #4caf50;
+      }
+      .test-case.invalid {
+        border-left-color: #f44336;
+      }
+      .test-input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background: #1a1a1a;
+        border: 1px solid #666;
+        color: white;
+        border-radius: 4px;
+      }
+      .test-input.valid {
+        border-color: #4caf50;
+      }
+      .test-input.invalid {
+        border-color: #f44336;
+      }
+      .test-input.optional {
+        border-color: #666;
+      }
+      .button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .button:hover {
+        background: #45a049;
+      }
+      .button.orange {
+        background: #ff9800;
+      }
+      .result {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .result.success {
+        background: #4caf50;
+      }
+      .result.error {
+        background: #f44336;
+      }
+      .result.optional {
+        background: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔗 Test Project URL Save Fix</h1>
+
+      <div class="test-case">
+        <h3>✅ Valid Project Links (Should Work):</h3>
+        <div>
+          <strong>Simple Domain:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="github.com"
+            onchange="testProjectLink(this)" />
+        </div>
+        <div>
+          <strong>Domain with Path:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="github.com/user/repository"
+            onchange="testProjectLink(this)" />
+        </div>
+        <div>
+          <strong>HTTPS URL:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="https://example.com"
+            onchange="testProjectLink(this)" />
+        </div>
+        <div>
+          <strong>HTTP URL:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="http://localhost:3000"
+            onchange="testProjectLink(this)" />
+        </div>
+        <div>
+          <strong>Localhost:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="localhost:8080/app"
+            onchange="testProjectLink(this)" />
+        </div>
+        <div>
+          <strong>Subdomain:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="api.example.com/v1"
+            onchange="testProjectLink(this)" />
+        </div>
+        <div>
+          <strong>Placeholder Link:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="#"
+            onchange="testProjectLink(this)" />
+        </div>
+        <div>
+          <strong>Empty (Optional):</strong>
+          <input
+            type="text"
+            class="test-input"
+            value=""
+            onchange="testProjectLink(this)" />
+        </div>
+      </div>
+
+      <div class="test-case invalid">
+        <h3>❌ Invalid Links (Should Fail):</h3>
+        <div>
+          <strong>Just Text:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="not-a-link"
+            onchange="testProjectLink(this)" />
+        </div>
+        <div>
+          <strong>Invalid Domain:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="invalid..domain"
+            onchange="testProjectLink(this)" />
+        </div>
+        <div>
+          <strong>Special Characters:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="test@#$%^&*()"
+            onchange="testProjectLink(this)" />
+        </div>
+      </div>
+
+      <div style="margin: 20px 0">
+        <button class="button" onclick="testAllLinks()">Test All Links</button>
+        <button class="button orange" onclick="openAdminDashboard()">
+          Open Admin Dashboard
+        </button>
+      </div>
+
+      <div id="testResults"></div>
+
+      <div class="test-case">
+        <h3>📝 Manual Test Instructions:</h3>
+        <ol>
+          <li>Click "Open Admin Dashboard" button</li>
+          <li>Login with credentials: admin / rahmatez2024</li>
+          <li>Go to Projects section</li>
+          <li>Click "Add New Project" or Edit existing project</li>
+          <li>
+            Try entering these project links:
+            <ul>
+              <li>
+                ✅
+                <code>github.com</code>
+                (should work now!)
+              </li>
+              <li>
+                ✅
+                <code>github.com/user/repo</code>
+              </li>
+              <li>
+                ✅
+                <code>https://example.com</code>
+              </li>
+              <li>
+                ✅
+                <code>localhost:3000</code>
+              </li>
+              <li>
+                ✅
+                <code>#</code>
+                (placeholder)
+              </li>
+              <li>✅ Leave empty (optional field)</li>
+              <li>
+                ❌
+                <code>invalid-text</code>
+                (should show error)
+              </li>
+            </ul>
+          </li>
+          <li>Verify that valid links can be saved successfully</li>
+        </ol>
+      </div>
+
+      <div class="test-case">
+        <h3>🔧 What Was Fixed:</h3>
+        <ul>
+          <li>
+            <strong>Before:</strong>
+            Project Link used
+            <code>type="url"</code>
+            - only accepted full URLs with protocol
+          </li>
+          <li>
+            <strong>After:</strong>
+            Changed to
+            <code>type="text"</code>
+            with custom validation
+          </li>
+          <li>
+            <strong>Now Accepts:</strong>
+            Domain names, paths, full URLs, localhost, and more
+          </li>
+          <li>
+            <strong>Real-time Feedback:</strong>
+            Border changes color as you type
+          </li>
+          <li>
+            <strong>Optional Field:</strong>
+            Empty values are allowed
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Copy the validation function from admin.html
+      function isValidProjectLink(link) {
+        if (!link || link.trim() === "") {
+          return true; // Empty is allowed for optional field
+        }
+
+        const trimmedLink = link.trim();
+
+        // Allow various formats:
+        return (
+          trimmedLink.startsWith("http://") ||
+          trimmedLink.startsWith("https://") ||
+          trimmedLink.startsWith("ftp://") ||
+          trimmedLink.startsWith("localhost") ||
+          trimmedLink.startsWith("127.0.0.1") ||
+          /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.([a-zA-Z]{2,})(\/.*)?$/.test(
+            trimmedLink
+          ) || // Domain with optional path
+          /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.[a-zA-Z]{2,}$/.test(
+            trimmedLink
+          ) || // Simple domain
+          /#/.test(trimmedLink) // Allow # for placeholder links
+        );
+      }
+
+      function testProjectLink(input) {
+        const value = input.value.trim();
+        const isValid = isValidProjectLink(value);
+
+        if (value === "") {
+          input.className = "test-input optional";
+          input.title = "✅ Empty (optional field)";
+        } else if (isValid) {
+          input.className = "test-input valid";
+          input.title = "✅ Valid project link";
+        } else {
+          input.className = "test-input invalid";
+          input.title = "❌ Invalid project link";
+        }
+      }
+
+      function testAllLinks() {
+        const inputs = document.querySelectorAll(".test-input");
+        let results = "<h3>Test Results:</h3>";
+        let validCount = 0;
+        let invalidCount = 0;
+        let optionalCount = 0;
+
+        inputs.forEach((input, index) => {
+          testProjectLink(input);
+          const value = input.value.trim();
+          const isValid = isValidProjectLink(value);
+
+          let status, className;
+          if (value === "") {
+            status = "✅ OPTIONAL (empty)";
+            className = "optional";
+            optionalCount++;
+          } else if (isValid) {
+            status = "✅ VALID";
+            className = "success";
+            validCount++;
+          } else {
+            status = "❌ INVALID";
+            className = "error";
+            invalidCount++;
+          }
+
+          results += `<div class="result ${className}">`;
+          results += `${index + 1}. "${value}" - ${status}`;
+          results += `</div>`;
+        });
+
+        results += `<div class="result ${
+          validCount > 0 || optionalCount > 0 ? "success" : "error"
+        }">`;
+        results += `Summary: ${validCount} valid, ${optionalCount} optional, ${invalidCount} invalid links`;
+        results += `</div>`;
+
+        document.getElementById("testResults").innerHTML = results;
+      }
+
+      function openAdminDashboard() {
+        window.open("../pages/admin.html", "_blank");
+      }
+
+      // Auto-test on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(testAllLinks, 500);
+      });
+    </script>
+  </body>
+</html>

@@ -171,8 +171,14 @@
 
         <!-- CONTACT SECTION -->
         <article class="contact active" data-page="contact">
-          <header>
+          <header
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            ">
             <h2 class="h2 article-title">Contact</h2>
+            <div></div>
           </header>
 
           <!-- MAP SECTION -->
@@ -193,13 +199,7 @@
           <section class="contact-form">
             <h3 class="h3 form-title">Contact Form</h3>
 
-            <form
-              action="mailto:rahmatezdev@gmail.com"
-              method="post"
-              enctype="text/plain"
-              onsubmit="return validateForm()"
-              class="form"
-              data-form>
+            <form id="contactForm" class="form" data-form>
               <div class="input-wrapper">
                 <!-- Input Name -->
                 <input
@@ -229,7 +229,11 @@
                 data-form-input></textarea>
 
               <!-- Submit Button -->
-              <button class="form-btn" type="submit" data-form-btn>
+              <button
+                class="form-btn"
+                type="submit"
+                data-form-btn
+                id="sendMessageBtn">
                 <ion-icon name="paper-plane"></ion-icon>
                 <span>Send Message</span>
               </button>
@@ -242,8 +246,27 @@
     <!-- custom js link -->
     <script src="../assets/js/script.js"></script>
 
-    <!-- Form validation script -->
+    <!-- Load authentication system first -->
+    <script src="../assets/js/auth-manager.js"></script>
+
+    <!-- CRUD functionality - Make sure this loads before our form script -->
+    <script src="../assets/js/crud-contact.js"></script>
+
+    <!-- Debug script to check if scripts loaded properly -->
     <script>
+      console.log(
+        "Auth manager loaded:",
+        typeof window.authManager !== "undefined"
+      );
+      console.log(
+        "Contact manager loaded:",
+        typeof window.contactManager !== "undefined"
+      );
+    </script>
+
+    <!-- Enhanced Form validation script -->
+    <script>
+      // Validate form inputs
       function validateForm() {
         const name = document.querySelector("input[name='fullname']").value;
         const email = document.querySelector("input[name='email']").value;
@@ -252,11 +275,263 @@
         ).value;
 
         if (!name || !email || !message) {
-          alert("Please fill in all the fields before submitting.");
+          showNotification(
+            "Please fill in all the fields before submitting.",
+            "error"
+          );
           return false;
         }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          showNotification("Please enter a valid email address.", "error");
+          return false;
+        }
+
         return true;
       }
+
+      // Enhanced form submission
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize authentication UI
+        updateAuthUI();
+
+        // Listen for authentication changes
+        window.addEventListener("authStateChanged", updateAuthUI);
+
+        // Set up form submission handling
+        const form = document.getElementById("contactForm");
+
+        if (form) {
+          form.addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent the default form submission
+            console.log("Form submitted");
+
+            if (validateForm()) {
+              console.log("Form is valid, submitting...");
+
+              // Get form data
+              const name = document.querySelector(
+                "input[name='fullname']"
+              ).value;
+              const email = document.querySelector("input[name='email']").value;
+              const message = document.querySelector(
+                "textarea[name='message']"
+              ).value;
+
+              // Create message data object
+              const messageData = {
+                name: name,
+                email: email,
+                message: message,
+              };
+
+              try {
+                // First check if contactManager is available
+                if (!window.contactManager) {
+                  throw new Error("Contact manager not available");
+                }
+
+                console.log(
+                  "Using contactManager to send message:",
+                  messageData
+                );
+
+                // Try to use contactManager first, fallback to localStorage
+                window.contactManager
+                  .createMessage(messageData)
+                  .then((savedMessage) => {
+                    console.log("Message saved successfully:", savedMessage);
+                    showNotification("Message sent successfully!", "success");
+                    form.reset();
+
+                    // Debug check after sending
+                    setTimeout(debugStorage, 500);
+                  })
+                  .catch((error) => {
+                    console.error(
+                      "Error with IndexedDB, using localStorage fallback:",
+                      error
+                    );
+
+                    // Manually save to localStorage as failsafe
+                    const newMessage = {
+                      id: Date.now(),
+                      ...messageData,
+                      date: new Date().toISOString(),
+                      status: "unread",
+                    };
+
+                    let messages = JSON.parse(
+                      localStorage.getItem("contact_messages") || "[]"
+                    );
+
+                    messages.push(newMessage);
+                    localStorage.setItem(
+                      "contact_messages",
+                      JSON.stringify(messages)
+                    );
+
+                    console.log(
+                      "Message saved to localStorage directly:",
+                      newMessage
+                    );
+                    showNotification("Message sent successfully!", "success");
+                    form.reset();
+
+                    // Debug check after sending
+                    setTimeout(debugStorage, 500);
+                  });
+              } catch (error) {
+                console.error("Error sending message:", error);
+                showNotification(
+                  "Something went wrong. Please try again.",
+                  "error"
+                );
+              }
+            }
+          });
+        }
+
+        // Admin panel access (press Ctrl+Shift+M)
+        document.addEventListener("keydown", function (e) {
+          if (e.ctrlKey && e.shiftKey && e.key === "M") {
+            displayMessages();
+          }
+        });
+      });
+
+      function updateAuthUI() {
+        const loginBtn = document.getElementById("loginBtn");
+        const adminBtn = document.getElementById("adminBtn");
+        const dashboardBtn = document.getElementById("dashboardBtn");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        if (window.authManager && window.authManager.isLoggedIn()) {
+          loginBtn.style.display = "none";
+          adminBtn.style.display = "inline-block";
+          dashboardBtn.style.display = "inline-block";
+          logoutBtn.style.display = "inline-block";
+        } else {
+          loginBtn.style.display = "inline-block";
+          adminBtn.style.display = "none";
+          dashboardBtn.style.display = "none";
+          logoutBtn.style.display = "none";
+          // Close contact admin panel if open
+          if (typeof closeContactAdmin === "function") {
+            closeContactAdmin();
+          }
+        }
+      }
+
+      // Create a simple localStorage-based contact manager as fallback
+      if (!window.contactManager) {
+        console.log("Creating fallback contact manager");
+        window.contactManager = {
+          createMessage: function (messageData) {
+            return new Promise((resolve, reject) => {
+              try {
+                // Get existing messages or create empty array
+                let messages = JSON.parse(
+                  localStorage.getItem("contact_messages") || "[]"
+                );
+
+                // Add new message with ID and date
+                const newMessage = {
+                  id: Date.now(),
+                  ...messageData,
+                  date: new Date().toISOString(),
+                  status: "unread",
+                };
+
+                messages.push(newMessage);
+                localStorage.setItem(
+                  "contact_messages",
+                  JSON.stringify(messages)
+                );
+
+                resolve(newMessage);
+              } catch (error) {
+                reject(error);
+              }
+            });
+          },
+          getAllMessages: function () {
+            return Promise.resolve(
+              JSON.parse(localStorage.getItem("contact_messages") || "[]")
+            );
+          },
+        };
+      }
+
+      // Define notification function to ensure it's always available on this page
+      window.showNotification = function (message, type = "info") {
+        const notification = document.createElement("div");
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          padding: 15px 20px;
+          border-radius: 8px;
+          color: white;
+          font-weight: 500;
+          z-index: 1000;
+          animation: slideIn 0.3s ease-out;
+          background: ${
+            type === "success"
+              ? "#28a745"
+              : type === "error"
+              ? "#dc3545"
+              : "#007bff"
+          };
+        `;
+
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.animation = "slideOut 0.3s ease-out";
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      };
+
+      // Add CSS for animations if not already added
+      if (!document.getElementById("notificationStyles")) {
+        const style = document.createElement("style");
+        style.id = "notificationStyles";
+        style.textContent = `
+          @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+          }
+          
+          @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      // Debug function to check storage
+      function debugStorage() {
+        const localMessages = JSON.parse(
+          localStorage.getItem("contact_messages") || "[]"
+        );
+        console.log("DEBUG - localStorage messages:", localMessages);
+
+        if (window.contactManager) {
+          window.contactManager.getAllMessages().then((messages) => {
+            console.log("DEBUG - contactManager messages:", messages);
+          });
+        }
+      }
+
+      // Call debug function on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(debugStorage, 1000); // Delay to ensure everything is loaded
+      });
     </script>
 
     <!-- ionicon link -->

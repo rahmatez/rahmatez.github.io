@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Image URL Fix</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .test-case {
+        background: #2a2a2a;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #4caf50;
+      }
+      .test-case.invalid {
+        border-left-color: #f44336;
+      }
+      .test-input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background: #1a1a1a;
+        border: 1px solid #666;
+        color: white;
+        border-radius: 4px;
+      }
+      .test-input.valid {
+        border-color: #4caf50;
+      }
+      .test-input.invalid {
+        border-color: #f44336;
+      }
+      .button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .button:hover {
+        background: #45a049;
+      }
+      .button.orange {
+        background: #ff9800;
+      }
+      .result {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .result.success {
+        background: #4caf50;
+      }
+      .result.error {
+        background: #f44336;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🖼️ Test Image URL Save Fix</h1>
+
+      <div class="test-case">
+        <h3>✅ Valid Image Paths (Should Work):</h3>
+        <div>
+          <strong>Relative Path:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="../assets/images/project-1.jpg"
+            onchange="testPath(this)" />
+        </div>
+        <div>
+          <strong>HTTP URL:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="https://via.placeholder.com/400x300.jpg"
+            onchange="testPath(this)" />
+        </div>
+        <div>
+          <strong>HTTPS URL:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="https://picsum.photos/400/300"
+            onchange="testPath(this)" />
+        </div>
+        <div>
+          <strong>Assets Path:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="assets/images/project-2.png"
+            onchange="testPath(this)" />
+        </div>
+        <div>
+          <strong>Absolute Path:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="/assets/images/project-3.jpg"
+            onchange="testPath(this)" />
+        </div>
+      </div>
+
+      <div class="test-case invalid">
+        <h3>❌ Invalid Paths (Should Fail):</h3>
+        <div>
+          <strong>Plain Text:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="not-an-image"
+            onchange="testPath(this)" />
+        </div>
+        <div>
+          <strong>No Extension:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value="images/project"
+            onchange="testPath(this)" />
+        </div>
+        <div>
+          <strong>Empty:</strong>
+          <input
+            type="text"
+            class="test-input"
+            value=""
+            onchange="testPath(this)" />
+        </div>
+      </div>
+
+      <div style="margin: 20px 0">
+        <button class="button" onclick="testAllPaths()">Test All Paths</button>
+        <button class="button orange" onclick="openAdminDashboard()">
+          Open Admin Dashboard
+        </button>
+      </div>
+
+      <div id="testResults"></div>
+
+      <div class="test-case">
+        <h3>📝 Manual Test Instructions:</h3>
+        <ol>
+          <li>Click "Open Admin Dashboard" button</li>
+          <li>Login with credentials: admin / rahmatez2024</li>
+          <li>Go to Projects section</li>
+          <li>Click "Add New Project"</li>
+          <li>
+            Try entering these image URLs:
+            <ul>
+              <li>
+                ✅
+                <code>../assets/images/project-1.jpg</code>
+              </li>
+              <li>
+                ✅
+                <code>https://via.placeholder.com/400x300.jpg</code>
+              </li>
+              <li>
+                ✅
+                <code>assets/images/project-2.png</code>
+              </li>
+              <li>
+                ❌
+                <code>invalid-path</code>
+                (should show error)
+              </li>
+            </ul>
+          </li>
+          <li>Verify that valid paths can be saved successfully</li>
+        </ol>
+      </div>
+    </div>
+
+    <script>
+      // Copy the validation function from admin.html
+      function isValidImagePath(path) {
+        if (!path || path.trim() === "") {
+          return false;
+        }
+
+        const trimmedPath = path.trim();
+
+        return (
+          trimmedPath.startsWith("http://") ||
+          trimmedPath.startsWith("https://") ||
+          trimmedPath.startsWith("/") ||
+          trimmedPath.startsWith("./") ||
+          trimmedPath.startsWith("../") ||
+          trimmedPath.startsWith("assets/") ||
+          /\.(jpg|jpeg|png|gif|svg|webp|bmp|ico)$/i.test(trimmedPath)
+        );
+      }
+
+      function testPath(input) {
+        const value = input.value.trim();
+        const isValid = isValidImagePath(value);
+
+        if (value === "") {
+          input.className = "test-input";
+          input.title = "Empty path";
+        } else if (isValid) {
+          input.className = "test-input valid";
+          input.title = "✅ Valid path";
+        } else {
+          input.className = "test-input invalid";
+          input.title = "❌ Invalid path";
+        }
+      }
+
+      function testAllPaths() {
+        const inputs = document.querySelectorAll(".test-input");
+        let results = "<h3>Test Results:</h3>";
+        let validCount = 0;
+        let invalidCount = 0;
+
+        inputs.forEach((input, index) => {
+          testPath(input);
+          const value = input.value.trim();
+          const isValid = isValidImagePath(value);
+
+          results += `<div class="result ${isValid ? "success" : "error"}">`;
+          results += `${index + 1}. "${value}" - ${
+            isValid ? "✅ VALID" : "❌ INVALID"
+          }`;
+          results += `</div>`;
+
+          if (isValid) validCount++;
+          else invalidCount++;
+        });
+
+        results += `<div class="result ${
+          validCount > 0 ? "success" : "error"
+        }">`;
+        results += `Summary: ${validCount} valid, ${invalidCount} invalid paths`;
+        results += `</div>`;
+
+        document.getElementById("testResults").innerHTML = results;
+      }
+
+      function openAdminDashboard() {
+        window.open("../pages/admin.html", "_blank");
+      }
+
+      // Auto-test on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(testAllPaths, 500);
+      });
+    </script>
+  </body>
+</html>

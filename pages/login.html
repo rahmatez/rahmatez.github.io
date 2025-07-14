@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - Rahmat Ashari Portfolio</title>
+
+    <!-- favicon -->
+    <link
+      rel="shortcut icon"
+      href="../assets/images/logo.ico"
+      type="image/x-icon" />
+
+    <!-- custom css link -->
+    <link rel="stylesheet" href="../assets/css/style.css" />
+
+    <!-- google font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet" />
+
+    <style>
+      .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--smoky-black);
+        padding: 20px;
+      }
+
+      .login-box {
+        background: var(--eerie-black-2);
+        border: 1px solid var(--jet);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: var(--shadow-2);
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .login-header h1 {
+        color: var(--white);
+        font-size: var(--fs-1);
+        margin-bottom: 10px;
+      }
+
+      .login-header p {
+        color: var(--light-gray);
+        font-size: var(--fs-6);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        color: var(--white);
+        font-size: var(--fs-6);
+        margin-bottom: 8px;
+        font-weight: var(--fw-500);
+      }
+
+      .form-group input {
+        width: 100%;
+        background: var(--eerie-black-1);
+        border: 1px solid var(--jet);
+        border-radius: 14px;
+        padding: 13px 16px;
+        color: var(--white);
+        font-size: var(--fs-6);
+        outline: none;
+        transition: var(--transition-1);
+      }
+
+      .form-group input:focus {
+        border-color: var(--orange-yellow-crayola);
+        box-shadow: 0 0 0 3px hsla(45, 100%, 72%, 0.1);
+      }
+
+      .form-group input::placeholder {
+        color: var(--light-gray-70);
+      }
+
+      .login-btn {
+        width: 100%;
+        background: var(--orange-yellow-crayola);
+        color: var(--smoky-black);
+        border: none;
+        border-radius: 14px;
+        padding: 13px 20px;
+        font-size: var(--fs-6);
+        font-weight: var(--fw-500);
+        cursor: pointer;
+        transition: var(--transition-1);
+        margin-bottom: 20px;
+      }
+
+      .login-btn:hover:not(:disabled) {
+        background: var(--vegas-gold);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-3);
+      }
+
+      .login-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .demo-credentials {
+        background: var(--onyx);
+        border: 1px solid var(--jet);
+        border-radius: 14px;
+        padding: 15px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: var(--transition-1);
+      }
+
+      .demo-credentials:hover {
+        background: var(--eerie-black-1);
+        border-color: var(--orange-yellow-crayola);
+      }
+
+      .demo-credentials h3 {
+        color: var(--orange-yellow-crayola);
+        font-size: var(--fs-7);
+        margin-bottom: 8px;
+      }
+
+      .demo-credentials p {
+        color: var(--light-gray);
+        font-size: var(--fs-8);
+        margin-bottom: 5px;
+      }
+
+      .back-link {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .back-link a {
+        color: var(--orange-yellow-crayola);
+        text-decoration: none;
+        font-size: var(--fs-7);
+        transition: var(--transition-1);
+      }
+
+      .back-link a:hover {
+        color: var(--vegas-gold);
+      }
+
+      .error-message {
+        background: hsla(0, 100%, 50%, 0.1);
+        border: 1px solid hsl(0, 100%, 50%);
+        color: hsl(0, 100%, 70%);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: var(--fs-7);
+        display: none;
+      }
+
+      .success-message {
+        background: hsla(120, 100%, 25%, 0.1);
+        border: 1px solid hsl(120, 100%, 40%);
+        color: hsl(120, 100%, 70%);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: var(--fs-7);
+        display: none;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        color: var(--light-gray);
+        font-size: var(--fs-7);
+        margin-top: 10px;
+      }
+
+      .loading::after {
+        content: "";
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border: 2px solid var(--orange-yellow-crayola);
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .debug-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        border-top: 1px solid var(--jet);
+        padding-top: 15px;
+      }
+
+      .debug-btn {
+        flex: 1;
+        background: var(--eerie-black-1);
+        border: 1px solid var(--jet);
+        color: var(--orange-yellow-crayola);
+        border-radius: 10px;
+        padding: 8px;
+        font-size: var(--fs-7);
+        cursor: pointer;
+        transition: var(--transition-1);
+      }
+
+      .debug-btn:hover {
+        background: var(--onyx);
+        border-color: var(--orange-yellow-crayola);
+      }
+
+      @media (max-width: 480px) {
+        .login-box {
+          padding: 30px 20px;
+          margin: 10px;
+        }
+
+        .login-header h1 {
+          font-size: var(--fs-2);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="login-container">
+      <div class="login-box">
+        <div class="login-header">
+          <h1 style="color: aliceblue">Admin Login</h1>
+          <p>Access your portfolio dashboard</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <form id="loginForm" method="post" action="#">
+          <div class="form-group">
+            <label for="username" style="color: aliceblue">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Enter your username"
+              required />
+          </div>
+
+          <div class="form-group">
+            <label for="password" style="color: aliceblue">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              required />
+          </div>
+
+          <button type="submit" class="login-btn" id="loginBtn">Login</button>
+          <div class="loading" id="loadingMessage">Authenticating...</div>
+        </form>
+
+        <!-- <div class="demo-credentials" id="demoCredentials">
+          <h3>Demo Credentials:</h3>
+          <p>
+            <strong>Username:</strong>
+            admin
+          </p>
+          <p>
+            <strong>Password:</strong>
+            rahmatez2024
+          </p>
+        </div> -->
+
+        <div class="back-link">
+          <a href="../index.html">← Back to Portfolio</a>
+        </div>
+
+        <!-- <div class="debug-buttons">
+          <button type="button" id="testLoginBtn" class="debug-btn">
+            Test Login
+          </button>
+          <button type="button" id="clearStorageBtn" class="debug-btn">
+            Clear Storage
+          </button>
+        </div> -->
+      </div>
+    </div>
+
+    <!-- Simple Authentication -->
+    <script src="../assets/js/simple-auth.js"></script>
+
+    <script>
+      // Initialize
+      console.log("Login page script loaded with SimpleAuthManager");
+
+      // DOM elements
+      const loginForm = document.getElementById("loginForm");
+      const errorMessage = document.getElementById("errorMessage");
+      const successMessage = document.getElementById("successMessage");
+      const loadingMessage = document.getElementById("loadingMessage");
+      const loginBtn = document.getElementById("loginBtn");
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+      const testLoginBtn = document.getElementById("testLoginBtn");
+      const clearStorageBtn = document.getElementById("clearStorageBtn");
+      const demoCredentials = document.getElementById("demoCredentials");
+
+      // Check if already logged in
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM loaded, checking SimpleAuthManager...");
+        console.log("Is logged in:", simpleAuthManager.isLoggedIn());
+
+        if (simpleAuthManager.isLoggedIn()) {
+          showSuccessMessage("Already logged in! Redirecting...");
+          setTimeout(() => {
+            window.location.href = "admin.html";
+          }, 1000);
+        }
+
+        // Focus on username input
+        usernameInput.focus();
+      });
+
+      // Handle form submission
+      loginForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        console.log("Form submitted, preventing default");
+
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+
+        console.log("Login attempt:", { username, password: "***" });
+
+        // Validation
+        if (!username || !password) {
+          showErrorMessage("Please fill in all fields");
+          return;
+        }
+
+        // Show loading state
+        showLoading(true);
+        hideMessages();
+
+        // Simple direct login attempt
+        const success = simpleAuthManager.login(username, password);
+        console.log("Login result:", success);
+
+        if (success) {
+          showSuccessMessage("Login successful! Redirecting to dashboard...");
+
+          // Clear form
+          usernameInput.value = "";
+          passwordInput.value = "";
+
+          // Redirect after short delay
+          setTimeout(() => {
+            console.log("Redirecting to admin.html");
+            window.location.href = "admin.html";
+          }, 1000);
+        } else {
+          console.error("Login failed: Invalid credentials");
+          showErrorMessage("Login failed. Invalid username or password.");
+
+          // Clear password field on error
+          passwordInput.value = "";
+          passwordInput.focus();
+        }
+
+        showLoading(false);
+      });
+
+      // Auto-fill demo credentials when clicked
+      demoCredentials.addEventListener("click", function () {
+        usernameInput.value = "admin";
+        passwordInput.value = "rahmatez2024";
+        usernameInput.focus();
+      });
+
+      // Debug buttons
+      testLoginBtn.addEventListener("click", function () {
+        testLogin();
+      });
+
+      clearStorageBtn.addEventListener("click", function () {
+        clearStorage();
+      });
+
+      // Utility functions
+      function showErrorMessage(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = "block";
+        successMessage.style.display = "none";
+      }
+
+      function showSuccessMessage(message) {
+        successMessage.textContent = message;
+        successMessage.style.display = "block";
+        errorMessage.style.display = "none";
+      }
+
+      function hideMessages() {
+        errorMessage.style.display = "none";
+        successMessage.style.display = "none";
+      }
+
+      function showLoading(show) {
+        if (show) {
+          loadingMessage.style.display = "block";
+          loginBtn.disabled = true;
+          loginBtn.textContent = "Authenticating...";
+        } else {
+          loadingMessage.style.display = "none";
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Login";
+        }
+      }
+
+      // Test function for debugging
+      function testLogin() {
+        console.log("Test login function called");
+
+        try {
+          // Reset any stale auth data first
+          localStorage.removeItem("loggedIn");
+          localStorage.removeItem("username");
+          localStorage.removeItem("loginTime");
+          console.log("Cleared existing auth data before test");
+
+          showLoading(true);
+          hideMessages();
+
+          const testUsername = "admin";
+          const testPassword = "rahmatez2024";
+
+          // Simple direct login test
+          const success = simpleAuthManager.login(testUsername, testPassword);
+          console.log("Test login result:", success);
+
+          if (success) {
+            showSuccessMessage(
+              "Login successful! Redirecting to admin page..."
+            );
+
+            setTimeout(() => {
+              console.log("Redirecting to admin.html");
+              window.location.href = "admin.html";
+            }, 1000);
+          } else {
+            throw new Error("Test login failed - invalid credentials");
+          }
+        } catch (error) {
+          console.error("Test login error:", error);
+          showErrorMessage("Test login error: " + error.message);
+        } finally {
+          showLoading(false);
+        }
+      }
+
+      // Clear storage function for debugging
+      function clearStorage() {
+        if (
+          confirm(
+            "Clear all stored authentication data? This will require re-login."
+          )
+        ) {
+          try {
+            // Clear all auth-related keys
+            localStorage.removeItem("loggedIn");
+            localStorage.removeItem("username");
+            localStorage.removeItem("loginTime");
+
+            console.log("Auth storage cleared completely");
+            showSuccessMessage("Auth storage cleared! Page will reload.");
+          } catch (e) {
+            console.error("Error clearing storage:", e);
+            showErrorMessage("Error clearing storage: " + e.message);
+          }
+
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        }
+      }
+
+      // Handle Enter key on inputs
+      usernameInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          passwordInput.focus();
+        }
+      });
+
+      passwordInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          loginForm.dispatchEvent(new Event("submit"));
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Anti-Duplicate Admin Panel</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .test-buttons {
+        display: flex;
+        gap: 10px;
+        margin: 15px 0;
+      }
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn-primary {
+        background: #007bff;
+        color: white;
+      }
+      .btn-success {
+        background: #28a745;
+        color: white;
+      }
+      .btn-warning {
+        background: #ffc107;
+        color: black;
+      }
+      .btn-danger {
+        background: #dc3545;
+        color: white;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .instructions {
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 15px 0;
+      }
+      .demo-credentials {
+        background: #fff3cd;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 15px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Test Anti-Duplicate Admin Panel</h1>
+
+    <div class="test-container">
+      <h2>🔐 Authentication Test</h2>
+      <div class="demo-credentials">
+        <h4>Demo Credentials:</h4>
+        <p>
+          <strong>Username:</strong>
+          admin
+        </p>
+        <p>
+          <strong>Password:</strong>
+          rahmatez2024
+        </p>
+      </div>
+
+      <div class="test-buttons">
+        <button class="btn-primary" onclick="authManager.showLogin()">
+          Show Login Modal
+        </button>
+        <button class="btn-danger" onclick="authManager.logout()">
+          Logout
+        </button>
+      </div>
+
+      <div id="authStatus" class="status info">
+        Please login to test admin panels
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>📊 Project Admin Panel Test</h2>
+      <div class="instructions">
+        <h4>Test Instructions:</h4>
+        <ol>
+          <li>Click "Show Project Admin" multiple times rapidly</li>
+          <li>Verify that only ONE panel appears (no duplicates)</li>
+          <li>Click "Close" to close the panel</li>
+          <li>Repeat the test to ensure it works consistently</li>
+        </ol>
+      </div>
+
+      <div class="test-buttons">
+        <button class="btn-success" onclick="testProjectAdmin()">
+          Show Project Admin
+        </button>
+        <button class="btn-warning" onclick="closeProjectAdmin()">
+          Close Project Admin
+        </button>
+      </div>
+
+      <div id="projectTestResult" class="status info">
+        Click "Show Project Admin" to test
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>📧 Contact Admin Panel Test</h2>
+      <div class="instructions">
+        <h4>Test Instructions:</h4>
+        <ol>
+          <li>Click "Show Contact Admin" multiple times rapidly</li>
+          <li>Verify that only ONE panel appears (no duplicates)</li>
+          <li>Click "Close" to close the panel</li>
+          <li>Repeat the test to ensure it works consistently</li>
+        </ol>
+      </div>
+
+      <div class="test-buttons">
+        <button class="btn-success" onclick="testContactAdmin()">
+          Show Contact Admin
+        </button>
+        <button class="btn-warning" onclick="closeContactAdmin()">
+          Close Contact Admin
+        </button>
+      </div>
+
+      <div id="contactTestResult" class="status info">
+        Click "Show Contact Admin" to test
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>🔑 Password Change Modal Test</h2>
+      <div class="instructions">
+        <h4>Test Instructions:</h4>
+        <ol>
+          <li>Click "Show Password Change" multiple times rapidly</li>
+          <li>Verify that only ONE modal appears (no duplicates)</li>
+          <li>Click "X" or outside modal to close</li>
+          <li>Repeat the test to ensure it works consistently</li>
+        </ol>
+      </div>
+
+      <div class="test-buttons">
+        <button class="btn-success" onclick="authManager.showPasswordChange()">
+          Show Password Change
+        </button>
+      </div>
+
+      <div id="passwordTestResult" class="status info">
+        Click "Show Password Change" to test
+      </div>
+    </div>
+
+    <div class="test-container">
+      <h2>📋 Test Results</h2>
+      <div id="testResults"></div>
+    </div>
+
+    <!-- Load all required scripts -->
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/crud-projects.js"></script>
+    <script src="assets/js/crud-contact.js"></script>
+
+    <script>
+      let testCount = 0;
+      let passedTests = 0;
+
+      function updateAuthStatus() {
+        const statusDiv = document.getElementById("authStatus");
+        if (authManager.isLoggedIn()) {
+          statusDiv.className = "status success";
+          statusDiv.textContent =
+            "✅ Authenticated - Admin panels are available";
+        } else {
+          statusDiv.className = "status info";
+          statusDiv.textContent = "ℹ️ Please login to test admin panels";
+        }
+      }
+
+      function testProjectAdmin() {
+        if (!authManager.isLoggedIn()) {
+          document.getElementById("projectTestResult").textContent =
+            "❌ Please login first";
+          return;
+        }
+
+        const beforeCount = document.querySelectorAll(
+          "#project-admin-panel"
+        ).length;
+
+        // Try to create multiple panels rapidly
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            if (typeof showProjectAdmin === "function") {
+              showProjectAdmin();
+            }
+          }, i * 50);
+        }
+
+        setTimeout(() => {
+          const afterCount = document.querySelectorAll(
+            "#project-admin-panel"
+          ).length;
+          const result = document.getElementById("projectTestResult");
+
+          if (afterCount === 1) {
+            result.className = "status success";
+            result.textContent =
+              "✅ Test PASSED - Only 1 panel created (no duplicates)";
+            passedTests++;
+          } else {
+            result.className = "status danger";
+            result.textContent = `❌ Test FAILED - ${afterCount} panels created (should be 1)`;
+          }
+          testCount++;
+          updateTestResults();
+        }, 500);
+      }
+
+      function testContactAdmin() {
+        if (!authManager.isLoggedIn()) {
+          document.getElementById("contactTestResult").textContent =
+            "❌ Please login first";
+          return;
+        }
+
+        const beforeCount = document.querySelectorAll(
+          "#contact-admin-panel"
+        ).length;
+
+        // Try to create multiple panels rapidly
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            if (typeof displayMessages === "function") {
+              displayMessages();
+            }
+          }, i * 50);
+        }
+
+        setTimeout(() => {
+          const afterCount = document.querySelectorAll(
+            "#contact-admin-panel"
+          ).length;
+          const result = document.getElementById("contactTestResult");
+
+          if (afterCount === 1) {
+            result.className = "status success";
+            result.textContent =
+              "✅ Test PASSED - Only 1 panel created (no duplicates)";
+            passedTests++;
+          } else {
+            result.className = "status danger";
+            result.textContent = `❌ Test FAILED - ${afterCount} panels created (should be 1)`;
+          }
+          testCount++;
+          updateTestResults();
+        }, 500);
+      }
+
+      function updateTestResults() {
+        const resultsDiv = document.getElementById("testResults");
+        resultsDiv.innerHTML = `
+                <div class="status ${
+                  passedTests === testCount ? "success" : "info"
+                }">
+                    <h4>Overall Test Results:</h4>
+                    <p>Tests Passed: ${passedTests} / ${testCount}</p>
+                    <p>Success Rate: ${
+                      testCount > 0
+                        ? Math.round((passedTests / testCount) * 100)
+                        : 0
+                    }%</p>
+                </div>
+            `;
+      }
+
+      // Listen for auth state changes
+      window.addEventListener("authStateChanged", updateAuthStatus);
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        updateAuthStatus();
+        updateTestResults();
+      });
+    </script>
+  </body>
+</html>

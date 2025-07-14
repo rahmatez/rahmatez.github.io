@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔗 Test Image Path Normalization</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #1a1a1a;
+        color: #fff;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+      .test-section {
+        background: #2a2a2a;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+        border-left: 4px solid #ff7b00;
+      }
+      .test-case {
+        background: #333;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .input-path {
+        font-family: monospace;
+        background: #555;
+        padding: 5px 10px;
+        border-radius: 3px;
+        color: #f0f0f0;
+        flex: 1;
+      }
+      .arrow {
+        margin: 0 15px;
+        color: #ff7b00;
+        font-weight: bold;
+      }
+      .output-path {
+        font-family: monospace;
+        background: #2a6e2a;
+        padding: 5px 10px;
+        border-radius: 3px;
+        color: #fff;
+        flex: 1;
+      }
+      .btn {
+        background: #ff7b00;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .btn:hover {
+        background: #e56a00;
+      }
+      .validation-result {
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      .valid {
+        background: #2a6e2a;
+        border-left: 4px solid #4caf50;
+      }
+      .invalid {
+        background: #6e2a2a;
+        border-left: 4px solid #f44336;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔗 Test Image Path Normalization</h1>
+      <p>
+        This tool tests the path normalization function to ensure consistent
+        image URLs between admin and frontend.
+      </p>
+
+      <div class="test-section">
+        <h2>🧪 Test Scenarios</h2>
+        <button class="btn" onclick="runAllTests()">Run All Tests</button>
+        <button class="btn" onclick="testCurrentProjects()">
+          Test Current Projects
+        </button>
+        <button class="btn" onclick="clearResults()">Clear Results</button>
+      </div>
+
+      <div class="test-section">
+        <h2>📋 Expected Normalization Results</h2>
+        <div id="test-results">
+          <p>Click "Run All Tests" to see normalization examples</p>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>🔍 Current Projects Analysis</h2>
+        <div id="project-analysis">
+          <p>Click "Test Current Projects" to analyze stored projects</p>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>⚙️ Interactive Test</h2>
+        <input
+          type="text"
+          id="testInput"
+          placeholder="Enter image path to test..."
+          style="
+            width: 70%;
+            padding: 10px;
+            margin-right: 10px;
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 5px;
+          " />
+        <button class="btn" onclick="testSinglePath()">Normalize</button>
+        <div id="single-result"></div>
+      </div>
+    </div>
+
+    <script>
+      // Normalize image path for consistency across admin and frontend
+      function normalizeImagePath(path) {
+        if (!path || path.trim() === "") {
+          return "";
+        }
+
+        const trimmedPath = path.trim();
+
+        // If it's a full URL (http/https), keep as is
+        if (
+          trimmedPath.startsWith("http://") ||
+          trimmedPath.startsWith("https://")
+        ) {
+          return trimmedPath;
+        }
+
+        // If it's already a correct relative path for pages folder, keep as is
+        if (trimmedPath.startsWith("../assets/images/")) {
+          return trimmedPath;
+        }
+
+        // If it starts with /assets/images/, convert to relative path
+        if (trimmedPath.startsWith("/assets/images/")) {
+          return ".." + trimmedPath;
+        }
+
+        // If it starts with assets/images/, add ../
+        if (trimmedPath.startsWith("assets/images/")) {
+          return "../" + trimmedPath;
+        }
+
+        // If it's just a filename, assume it's in assets/images/
+        if (!trimmedPath.includes("/") && !trimmedPath.includes("\\")) {
+          return "../assets/images/" + trimmedPath;
+        }
+
+        // Default: assume it needs ../ prefix for pages folder
+        return trimmedPath.startsWith("../")
+          ? trimmedPath
+          : "../" + trimmedPath;
+      }
+
+      function runAllTests() {
+        const testCases = [
+          {
+            input: "/assets/images/project-1.jpg",
+            description: "Absolute path from root",
+          },
+          {
+            input: "assets/images/project-2.png",
+            description: "Relative path without ../",
+          },
+          {
+            input: "../assets/images/project-3.jpg",
+            description: "Correct relative path",
+          },
+          {
+            input: "project-4.png",
+            description: "Just filename",
+          },
+          {
+            input: "https://example.com/image.jpg",
+            description: "External HTTPS URL",
+          },
+          {
+            input: "http://localhost/images/test.png",
+            description: "External HTTP URL",
+          },
+          {
+            input: "images/project-5.jpg",
+            description: "Relative path with subfolder",
+          },
+          {
+            input: "./assets/images/project-6.png",
+            description: "Current directory relative path",
+          },
+          {
+            input: "",
+            description: "Empty path",
+          },
+          {
+            input: "   /assets/images/project-7.jpg   ",
+            description: "Path with whitespace",
+          },
+        ];
+
+        const resultsDiv = document.getElementById("test-results");
+        resultsDiv.innerHTML = testCases
+          .map((testCase) => {
+            const normalized = normalizeImagePath(testCase.input);
+            return `
+                    <div class="test-case">
+                        <div>
+                            <strong>${testCase.description}</strong><br>
+                            <span class="input-path">${
+                              testCase.input || "(empty)"
+                            }</span>
+                        </div>
+                        <span class="arrow">→</span>
+                        <div>
+                            <strong>Normalized:</strong><br>
+                            <span class="output-path">${
+                              normalized || "(empty)"
+                            }</span>
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      function testCurrentProjects() {
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+        const analysisDiv = document.getElementById("project-analysis");
+
+        if (projects.length === 0) {
+          analysisDiv.innerHTML = "<p>❌ No projects found in localStorage</p>";
+          return;
+        }
+
+        const results = projects
+          .map((project) => {
+            const originalPath = project.image;
+            const normalizedPath = normalizeImagePath(originalPath);
+            const needsNormalization = originalPath !== normalizedPath;
+
+            return `
+                    <div class="validation-result ${
+                      needsNormalization ? "invalid" : "valid"
+                    }">
+                        <h4>📁 ${project.title}</h4>
+                        <p><strong>Current Path:</strong> <code>${originalPath}</code></p>
+                        <p><strong>Normalized Path:</strong> <code>${normalizedPath}</code></p>
+                        <p><strong>Status:</strong> ${
+                          needsNormalization
+                            ? "⚠️ Needs Normalization"
+                            : "✅ Already Correct"
+                        }</p>
+                    </div>
+                `;
+          })
+          .join("");
+
+        const needsFixCount = projects.filter(
+          (p) => p.image !== normalizeImagePath(p.image)
+        ).length;
+
+        analysisDiv.innerHTML = `
+                <div class="validation-result ${
+                  needsFixCount > 0 ? "invalid" : "valid"
+                }">
+                    <h3>📊 Summary</h3>
+                    <p><strong>Total Projects:</strong> ${projects.length}</p>
+                    <p><strong>Correct Paths:</strong> ${
+                      projects.length - needsFixCount
+                    }</p>
+                    <p><strong>Need Normalization:</strong> ${needsFixCount}</p>
+                    <p><strong>Overall Status:</strong> ${
+                      needsFixCount === 0
+                        ? "✅ All paths correct"
+                        : "⚠️ Some paths need fixing"
+                    }</p>
+                </div>
+                ${results}
+            `;
+      }
+
+      function testSinglePath() {
+        const input = document.getElementById("testInput").value;
+        const normalized = normalizeImagePath(input);
+        const resultDiv = document.getElementById("single-result");
+
+        resultDiv.innerHTML = `
+                <div class="validation-result ${
+                  input === normalized ? "valid" : "invalid"
+                }" style="margin-top: 15px;">
+                    <p><strong>Input:</strong> <code>${
+                      input || "(empty)"
+                    }</code></p>
+                    <p><strong>Normalized:</strong> <code>${
+                      normalized || "(empty)"
+                    }</code></p>
+                    <p><strong>Changed:</strong> ${
+                      input === normalized
+                        ? "❌ No change needed"
+                        : "✅ Path normalized"
+                    }</p>
+                </div>
+            `;
+      }
+
+      function clearResults() {
+        document.getElementById("test-results").innerHTML =
+          '<p>Click "Run All Tests" to see normalization examples</p>';
+        document.getElementById("project-analysis").innerHTML =
+          '<p>Click "Test Current Projects" to analyze stored projects</p>';
+        document.getElementById("single-result").innerHTML = "";
+        document.getElementById("testInput").value = "";
+      }
+
+      // Auto-run tests on page load
+      window.onload = function () {
+        runAllTests();
+      };
+
+      // Add enter key support for single test
+      document
+        .getElementById("testInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            testSinglePath();
+          }
+        });
+    </script>
+  </body>
+</html>

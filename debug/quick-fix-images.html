@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quick Image Fix Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 10px;
+        font-size: 16px;
+      }
+      .button:hover {
+        background: #45a049;
+      }
+      .button.orange {
+        background: #ff9800;
+      }
+      .button.blue {
+        background: #2196f3;
+      }
+      .status {
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 8px;
+        background: #2a2a2a;
+      }
+      .success {
+        background: #4caf50;
+      }
+      .warning {
+        background: #ff9800;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🖼️ Quick Image Fix</h1>
+
+      <div class="status" id="status">
+        Click "Fix Images Now" to resolve image display issues
+      </div>
+
+      <button class="button" onclick="fixImagesNow()">🔧 Fix Images Now</button>
+      <button class="button orange" onclick="checkImages()">
+        🔍 Check Current Images
+      </button>
+      <button class="button blue" onclick="openProjectPage()">
+        📁 Open Project Page
+      </button>
+
+      <div id="result" style="margin-top: 20px"></div>
+    </div>
+
+    <script>
+      function fixImagesNow() {
+        // Clear existing projects and initialize with correct paths
+        localStorage.removeItem("portfolio_projects");
+
+        const defaultProjects = [
+          {
+            id: "finance-" + Date.now(),
+            title: "Finance",
+            category: "web development",
+            image: "../assets/images/project-1.jpg",
+            description:
+              "A comprehensive finance management application built with modern web technologies.",
+            technologies: ["HTML", "CSS", "JavaScript", "PHP"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "orizon-" + Date.now(),
+            title: "Orizon",
+            category: "web development",
+            image: "../assets/images/project-2.png",
+            description:
+              "Modern web application with clean design and smooth user experience.",
+            technologies: ["React", "Node.js", "MongoDB"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "fundo-" + Date.now(),
+            title: "Fundo",
+            category: "web design",
+            image: "../assets/images/project-3.jpg",
+            description:
+              "Creative web design project focusing on user interface and experience.",
+            technologies: ["Figma", "Adobe XD", "CSS3"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "brawlhalla-" + Date.now(),
+            title: "Brawlhalla",
+            category: "ui/ux design",
+            image: "../assets/images/project-4.png",
+            description:
+              "Game interface design with focus on user experience and visual appeal.",
+            technologies: ["Sketch", "Photoshop", "Illustrator"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "dsm-" + Date.now(),
+            title: "DSM",
+            category: "ui/ux design",
+            image: "../assets/images/project-5.png",
+            description:
+              "Design system management tool for consistent brand experience.",
+            technologies: ["Figma", "Design Tokens", "Documentation"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "metaspark-" + Date.now(),
+            title: "MetaSpark",
+            category: "web development",
+            image: "../assets/images/project-6.png",
+            description:
+              "Innovative web platform for digital transformation and automation.",
+            technologies: ["Vue.js", "Express.js", "PostgreSQL"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "summary-" + Date.now(),
+            title: "Summary",
+            category: "web development",
+            image: "../assets/images/project-7.png",
+            description:
+              "Content summarization tool with AI-powered text processing.",
+            technologies: ["Python", "Machine Learning", "API"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "task-manager-" + Date.now(),
+            title: "Task Manager",
+            category: "web development",
+            image: "../assets/images/project-8.jpg",
+            description:
+              "Professional task management system with team collaboration features.",
+            technologies: ["Angular", "Firebase", "TypeScript"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: "arrival-" + Date.now(),
+            title: "Arrival",
+            category: "web design",
+            image: "../assets/images/project-9.png",
+            description:
+              "Landing page design for transportation and logistics company.",
+            technologies: ["HTML5", "CSS3", "JavaScript", "GSAP"],
+            link: "#",
+            createdAt: new Date().toISOString(),
+          },
+        ];
+
+        localStorage.setItem(
+          "portfolio_projects",
+          JSON.stringify(defaultProjects)
+        );
+
+        document.getElementById("status").className = "status success";
+        document.getElementById("status").innerHTML =
+          "✅ Images fixed successfully! Projects initialized with correct image paths.";
+
+        document.getElementById("result").innerHTML = `
+                <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                    <h3>✅ Fix Complete!</h3>
+                    <p><strong>${defaultProjects.length} projects</strong> created with correct image paths</p>
+                    <p>All images are now pointing to: <code>../assets/images/project-*.jpg/png</code></p>
+                    <p>Click "Open Project Page" to see the results!</p>
+                </div>
+            `;
+      }
+
+      function checkImages() {
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+
+        if (projects.length === 0) {
+          document.getElementById("result").innerHTML = `
+                    <div style="background: #ff9800; color: black; padding: 15px; border-radius: 8px;">
+                        ⚠️ No projects found! Click "Fix Images Now" first.
+                    </div>
+                `;
+          return;
+        }
+
+        let html =
+          '<div style="background: #2a2a2a; padding: 15px; border-radius: 8px; text-align: left;">';
+        html += `<h3>📊 Current Projects (${projects.length})</h3>`;
+
+        projects.forEach((project, index) => {
+          html += `<div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 4px;">`;
+          html += `<strong>${index + 1}. ${project.title}</strong><br>`;
+          html += `Image: <code>${project.image}</code><br>`;
+          html += `Category: ${project.category}`;
+          html += `</div>`;
+        });
+
+        html += "</div>";
+        document.getElementById("result").innerHTML = html;
+      }
+
+      function openProjectPage() {
+        window.open("../pages/project.html", "_blank");
+      }
+
+      // Auto-check on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        const projects = JSON.parse(
+          localStorage.getItem("portfolio_projects") || "[]"
+        );
+
+        if (projects.length === 0) {
+          document.getElementById("status").className = "status warning";
+          document.getElementById("status").innerHTML =
+            '⚠️ No projects found. Click "Fix Images Now" to initialize default projects.';
+        } else {
+          document.getElementById("status").className = "status success";
+          document.getElementById(
+            "status"
+          ).innerHTML = `✅ Found ${projects.length} projects in storage. Click "Check Current Images" to view details.`;
+        }
+      });
+    </script>
+  </body>
+</html>
